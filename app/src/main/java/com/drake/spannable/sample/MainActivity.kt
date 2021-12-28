@@ -20,13 +20,20 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.SpannableString
+import android.text.method.LinkMovementMethod
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.text.style.URLSpan
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.drake.spannable.*
+import com.drake.spannable.addSpan
+import com.drake.spannable.movement.ClickableMovementMethod
+import com.drake.spannable.replaceSpan
+import com.drake.spannable.replaceSpanFirst
 import com.drake.spannable.sample.databinding.ActivityMainBinding
+import com.drake.spannable.setSpan
+import com.drake.spannable.span.HighlightSpan
 
 
 class MainActivity : AppCompatActivity() {
@@ -38,19 +45,27 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // 替换Span
+        binding.tv.movementMethod = ClickableMovementMethod.getInstance()
         binding.tv.text = "隐私权政策 | 许可 | 品牌指南".replaceSpan("隐私权政策") {
             URLSpan("https://github.com/") // 仅替换效果
         }
 
-        // 正则匹配两个单词
-        binding.tv1.text = "隐私权政策 | 许可 | 品牌指南".replaceSpan("\\b\\w{2}\\b".toRegex()) {
-            SpannableString("用户协议").setSpan(URLSpan("https://github.com/")) // 替换文字和效果
-        }
+        // 自动设置网址
+        binding.tv1.movementMethod = LinkMovementMethod()
+        binding.tv1.text = "打开官网: https://github.com/" // 地址/邮箱/手机号码等匹配可以不使用Span, 可以在xml中指定autoLink属性, 会有点击背景色
 
-        // 正则匹配同时使用分组引用
-        binding.tv2.text = "隐私权政策 | 许可 | 品牌指南".replaceSpan("\\| (.*) \\|".toRegex(), true) {
-            SpannableString("# $0 #").setSpan(URLSpan("https://github.com/"))
-        }
+        // 使用正则匹配
+        binding.tv2.movementMethod = ClickableMovementMethod.getInstance() // 保证没有点击背景色
+        binding.tv2.text = "我们可以艾特用户@刘强东 或者创建#热门标签"
+            .replaceSpan("@[^@]+?(?=\\s|\$)".toRegex()) { matchResult ->
+                HighlightSpan(Color.parseColor("#ed6a2c")) {
+                    Toast.makeText(this@MainActivity, "点击用户 ${matchResult.value}", Toast.LENGTH_SHORT).show()
+                }
+            }.replaceSpan("#[^#]+?(?=\\s|\$)".toRegex()) { matchResult ->
+                HighlightSpan(Color.parseColor("#4a70d2"), Typeface.defaultFromStyle(Typeface.BOLD)) {
+                    Toast.makeText(this@MainActivity, "点击标签 ${matchResult.value}", Toast.LENGTH_SHORT).show()
+                }
+            }
 
         // 仅替换第一个匹配项
         binding.tv3.text = "隐私权政策 | 隐私权政策 | 品牌指南".replaceSpanFirst("隐私权政策") {
@@ -66,11 +81,12 @@ class MainActivity : AppCompatActivity() {
             .addSpan(" 1000+ 人付款")
 
         // 通过替换方式展示价格
-        binding.tv6.text = "¥39.9 1000+ 人付款".replaceSpan("¥[\\d\\.]+".toRegex()) { // 设置价格颜色
-            ForegroundColorSpan(Color.parseColor("#ed6a2c"))
-        }.replaceSpanFirst("[\\d\\.]+".toRegex()) { // 设置价格字号
-            AbsoluteSizeSpan(18, true)
-        }
+        binding.tv6.text = "¥39.9 1000+ 人付款"
+            .replaceSpan("¥[\\d\\.]+".toRegex()) { // 匹配价格颜色(包含货币符号)
+                ForegroundColorSpan(Color.parseColor("#ed6a2c"))
+            }.replaceSpanFirst("[\\d\\.]+".toRegex()) { // 匹配价格字号
+                AbsoluteSizeSpan(18, true)
+            }
     }
 }
 

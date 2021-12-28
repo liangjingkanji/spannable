@@ -15,6 +15,7 @@
         android:id="@+id/tv1"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:autoLink="all"
         android:gravity="center" />
 
     <TextView
