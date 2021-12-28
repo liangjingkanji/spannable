@@ -3,10 +3,17 @@
 
 
 <p align="center">
-<a href="https://jitpack.io/#liangjingkanji/Spannable"><img src="https://jitpack.io/v/liangjingkanji/Spannable.svg"/></a>
+<a href="https://jitpack.io/#liangjingkanji/spannable"><img src="https://jitpack.io/v/liangjingkanji/spannable.svg"/></a>
 <img src="https://img.shields.io/badge/language-kotlin-orange.svg"/>
 <img src="https://img.shields.io/badge/license-Apache-blue"/>
 <a href="https://jq.qq.com/?_wv=1027&k=vWsXSNBJ"><img src="https://img.shields.io/badge/QQ群-752854893-blue"/></a>
+</p>
+
+
+<br>
+
+<p align="center">
+<img src="https://s2.loli.net/2021/12/28/1EQMqYTvwL8Du3G.jpg" width="650"/>
 </p>
 
 <br>
@@ -19,17 +26,19 @@
 
 ## 特点
 
-- 首个支持替换和正则匹配替换Span
-- 支持快速设置和添加Span
-- 全部使用CharSequence接口, 让字符串和Spanable通用
+- 首个支持替换/正则匹配Span的库
+- 支持快速设置/添加/插入Span
 - 支持正则捕获分组
+- 全部使用CharSequence接口, 让字符串和Spanable通用
 
 ## 函数
+
+使用的函数非常简单
 
 | 函数             | 介绍                                    |
 | ---------------- | --------------------------------------- |
 | setSpan          | 设置Span                                |
-| addSpan          | 添加Span                                |
+| addSpan          | 添加/插入Span或字符串                   |
 | replaceSpan      | 替换/正则替换Span或字符串               |
 | replaceSpanFirst | 替换/正则替换第一个匹配项的Span或字符串 |
 
