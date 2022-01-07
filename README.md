@@ -1,6 +1,6 @@
-<p align="center"><strong>创建SpannableString和创建字符串一样简单</strong></p>
 
-
+<p align="center"> <img align="center" src="https://s2.loli.net/2022/01/07/fbn3Evl82xy4cHY.png" width="350"/></p>
+<p align="center"> <strong>创建SpannableString和创建字符串一样简单</strong> </p>
 
 <p align="center">
 <a href="https://jitpack.io/#liangjingkanji/spannable"><img src="https://jitpack.io/v/liangjingkanji/spannable.svg"/></a>
