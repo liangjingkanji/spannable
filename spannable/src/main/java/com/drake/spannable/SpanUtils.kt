@@ -216,7 +216,7 @@ fun CharSequence.replaceSpan(regex: Regex, quoteGroup: Boolean = false, replacem
 }
 
 /**
- * 替换匹配的字符串
+ * 替换第一个匹配的字符串
  *
  * @param oldValue 被替换的字符串
  * @param ignoreCase 忽略大小写
@@ -258,6 +258,91 @@ fun CharSequence.replaceSpanFirst(oldValue: String, ignoreCase: Boolean = false,
 @JvmOverloads
 fun CharSequence.replaceSpanFirst(regex: Regex, quoteGroup: Boolean = false, replacement: (MatchResult) -> Any?): CharSequence {
     val matchResult = regex.find(this) ?: return this
+    val spanBuilder = SpannableStringBuilder(this)
+    val range = matchResult.range
+    replacement(matchResult)?.let { spanned ->
+        when (spanned) {
+            is List<*> -> for (item in spanned) {
+                spanBuilder[range.first, range.last + 1] = item ?: continue
+            }
+            is Array<*> -> for (item in spanned) {
+                spanBuilder[range.first, range.last + 1] = item ?: continue
+            }
+            is CharSequence -> {
+                var adjustReplacement: CharSequence = spanned
+                val groups = matchResult.destructured.toList()
+                if (quoteGroup && groups.isNotEmpty()) {
+                    val attachedSpans = if (spanned is Spanned) {
+                        spanned.getSpans(0, spanned.length, Any::class.java)
+                    } else null
+                    groups.forEachIndexed { index, s ->
+                        val groupRegex = "\\$$index".toRegex()
+                        if (adjustReplacement.contains(groupRegex)) {
+                            adjustReplacement = adjustReplacement.replace(groupRegex, s)
+                        }
+                    }
+                    if (attachedSpans != null && adjustReplacement !== spanned) {
+                        attachedSpans.forEach {
+                            if (adjustReplacement is Spannable) {
+                                adjustReplacement.setSpan(it)
+                            } else {
+                                adjustReplacement = SpannableString(adjustReplacement).apply { setSpan(it) }
+                            }
+                        }
+                    }
+                }
+                val matchLength = matchResult.value.length
+                spanBuilder.replace(range.first, range.first + matchLength, adjustReplacement)
+            }
+            else -> spanBuilder[range.first, range.last + 1] = spanned
+        }
+    }
+    return spanBuilder
+}
+
+/**
+ * 替换最后一个匹配的字符串
+ *
+ * @param oldValue 被替换的字符串
+ * @param ignoreCase 忽略大小写
+ * @param replacement 每次匹配到字符串都会调用此函数
+ * 1. 如果返回null则表示不执行任何操作
+ * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
+ * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
+ * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
+ * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
+ * 6. 和[replace]函数不同的时本函数会保留原有[android.text.Spanned]的效果
+ *
+ * @return 如果没有匹配任何项会返回原来的[CharSequence]
+ */
+@JvmOverloads
+fun CharSequence.replaceSpanLast(oldValue: String, ignoreCase: Boolean = false, replacement: (MatchResult) -> Any?): CharSequence {
+    val regex = if (ignoreCase) {
+        Regex.escape(oldValue).toRegex(RegexOption.IGNORE_CASE)
+    } else {
+        Regex.escape(oldValue).toRegex()
+    }
+    return replaceSpanLast(regex, replacement = replacement)
+}
+
+/**
+ * 使用正则替换最后一个匹配字符串
+ *
+ * @param regex 正则
+ * @param quoteGroup 是否允许反向引用捕获组
+ * @param replacement 每次匹配到字符串都会调用此函数
+ * 1. 如果返回null则表示不执行任何操作
+ * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
+ * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
+ * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
+ * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
+ * 6. 和[replace]函数不同的时本函数会保留原有[android.text.Spanned]的效果
+ *
+ * @return 如果没有匹配任何项会返回原来的[CharSequence]
+ */
+@JvmOverloads
+fun CharSequence.replaceSpanLast(regex: Regex, quoteGroup: Boolean = false, replacement: (MatchResult) -> Any?): CharSequence {
+    val matchResult = regex.findAll(this).lastOrNull() ?: return this
     val spanBuilder = SpannableStringBuilder(this)
     val range = matchResult.range
     replacement(matchResult)?.let { spanned ->
