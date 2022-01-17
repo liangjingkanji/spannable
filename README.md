@@ -40,8 +40,7 @@
 | setSpan          | 设置Span                                |
 | addSpan          | 添加/插入Span或字符串                   |
 | replaceSpan      | 替换/正则替换Span或字符串               |
-| replaceSpanFirst | 替换/正则替换第一个匹配项的Span或字符串 |
-| replaceSpanLast | 替换/正则替换最后一个匹配项的Span或字符串 |
+| replaceSpanFirst/replaceSpanLast | 替换/正则替换第一个/最后一个匹配项的Span或字符串 |
 
 ## 安装
 
