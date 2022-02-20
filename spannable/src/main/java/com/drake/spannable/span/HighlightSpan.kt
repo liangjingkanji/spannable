@@ -16,13 +16,33 @@
 
 package com.drake.spannable.span
 
+import android.content.Context
+import android.graphics.Color
 import android.graphics.Typeface
 import android.text.TextPaint
 import android.text.style.ClickableSpan
 import android.view.View
 import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 
-class HighlightSpan(@ColorInt val color: Int, val typeface: Typeface? = null, val onClick: ((View) -> Unit)? = null) : ClickableSpan() {
+class HighlightSpan(
+    @ColorInt val color: Int,
+    val typeface: Typeface? = null,
+    val onClick: ((View) -> Unit)? = null
+) : ClickableSpan() {
+
+    constructor(
+        color: String,
+        typeface: Typeface? = null,
+        onClick: ((View) -> Unit)? = null
+    ) : this(Color.parseColor(color), typeface, onClick)
+
+    constructor(
+        context: Context,
+        @ColorRes colorRes: Int,
+        typeface: Typeface? = null,
+        onClick: ((View) -> Unit)? = null
+    ) : this(context.resources.getColor(colorRes), typeface, onClick)
 
     override fun updateDrawState(ds: TextPaint) {
         ds.color = color

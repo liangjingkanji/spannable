@@ -22,7 +22,6 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.style.AbsoluteSizeSpan
-import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.text.style.URLSpan
 import android.widget.Toast
@@ -33,6 +32,7 @@ import com.drake.spannable.replaceSpan
 import com.drake.spannable.replaceSpanFirst
 import com.drake.spannable.sample.databinding.ActivityMainBinding
 import com.drake.spannable.setSpan
+import com.drake.spannable.span.ColorSpan
 import com.drake.spannable.span.HighlightSpan
 
 
@@ -58,11 +58,11 @@ class MainActivity : AppCompatActivity() {
         binding.tv2.movementMethod = ClickableMovementMethod.getInstance() // 保证没有点击背景色
         binding.tv2.text = "我们可以艾特用户@刘强东 或者创建#热门标签"
             .replaceSpan("@[^@]+?(?=\\s|\$)".toRegex()) { matchResult ->
-                HighlightSpan(Color.parseColor("#ed6a2c")) {
+                HighlightSpan("#ed6a2c") {
                     Toast.makeText(this@MainActivity, "点击用户 ${matchResult.value}", Toast.LENGTH_SHORT).show()
                 }
             }.replaceSpan("#[^#]+?(?=\\s|\$)".toRegex()) { matchResult ->
-                HighlightSpan(Color.parseColor("#4a70d2"), Typeface.defaultFromStyle(Typeface.BOLD)) {
+                HighlightSpan("#4a70d2", Typeface.defaultFromStyle(Typeface.BOLD)) {
                     Toast.makeText(this@MainActivity, "点击标签 ${matchResult.value}", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -73,17 +73,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         // 添加一个字符串+Span, 注意括号保证函数执行优先级
-        binding.tv4.text = ("隐私权政策 | 许可 | 品牌指南" + " | ").addSpan("官网", listOf(ForegroundColorSpan(Color.BLUE), StyleSpan(Typeface.BOLD)))
+        binding.tv4.text = ("隐私权政策 | 许可 | 品牌指南" + " | ").addSpan("官网", listOf(ColorSpan(Color.BLUE), StyleSpan(Typeface.BOLD)))
 
         // 通过拼接方式展示价格
-        binding.tv5.text = "¥".setSpan(ForegroundColorSpan(Color.parseColor("#ed6a2c")))
-            .addSpan("39.9", arrayOf(ForegroundColorSpan(Color.parseColor("#ed6a2c")), AbsoluteSizeSpan(18, true)))
+        binding.tv5.text = "¥".setSpan(ColorSpan("#ed6a2c"))
+            .addSpan("39.9", arrayOf(ColorSpan("#ed6a2c"), AbsoluteSizeSpan(18, true)))
             .addSpan(" 1000+ 人付款")
 
         // 通过替换方式展示价格
         binding.tv6.text = "¥39.9 1000+ 人付款"
             .replaceSpan("¥[\\d\\.]+".toRegex()) { // 匹配价格颜色(包含货币符号)
-                ForegroundColorSpan(Color.parseColor("#ed6a2c"))
+                ColorSpan("#ed6a2c")
             }.replaceSpanFirst("[\\d\\.]+".toRegex()) { // 匹配价格字号
                 AbsoluteSizeSpan(18, true)
             }
