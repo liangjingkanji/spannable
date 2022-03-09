@@ -29,7 +29,8 @@ import android.view.View;
 import android.widget.TextView;
 
 /**
- * 点击不会有背景色
+ * 等效于[android.text.method.LinkMovementMethod], 但是点击不会有背景色
+ * <p>
  * A movement method that traverses links in the text buffer and scrolls if necessary.
  * Supports clicking on links with DPad Center or Enter.
  */
