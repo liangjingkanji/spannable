@@ -23,29 +23,18 @@ import android.text.Spanned
 import androidx.core.text.set
 
 /**
- * 设置Span文字效果
- * @param what 文字效果, 如果为数组或者集合则设置多个
- * @param flags 参考 [Spanned.SPAN_EXCLUSIVE_EXCLUSIVE]
- *
- * @return 如果接受者不为[Spannable]则将返回一个新的对象
+ * 创建替换需要的正则
  */
-@JvmOverloads
-fun CharSequence.setSpan(what: Any?, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE): CharSequence {
-    val str = when (this) {
-        is Spannable -> this
-        else -> SpannableString(this)
-    }
-    when (what) {
-        is Array<*> -> what.forEach {
-            str.apply { setSpan(it, 0, length, flags) }
-        }
-        is List<*> -> what.forEach {
-            str.apply { setSpan(it, 0, length, flags) }
-        }
-        else -> str.apply { setSpan(what, 0, length, flags) }
-    }
-    return str
+private fun String.createReplaceStringRegex(ignoreCase: Boolean):Regex = if (ignoreCase) {
+    Regex.escape(this).toRegex(RegexOption.IGNORE_CASE)
+} else {
+    Regex.escape(this).toRegex()
 }
+
+/**
+ * 默认 start & end & where index
+ */
+private const val DEFAULT_INDEX = -1
 
 /**
  * 设置Span文字效果
@@ -57,60 +46,34 @@ fun CharSequence.setSpan(what: Any?, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSI
  * @return 如果接受者不为[Spannable]则将返回一个新的对象
  */
 @JvmOverloads
-fun CharSequence.setSpan(what: Any?, start: Int, end: Int, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE): CharSequence {
+fun CharSequence.setSpan(what: Any?, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE, start: Int = DEFAULT_INDEX, end: Int = DEFAULT_INDEX): CharSequence {
     val str = when (this) {
         is Spannable -> this
         else -> SpannableString(this)
     }
     when (what) {
         is Array<*> -> what.forEach {
-            str.apply { setSpan(it, start, end, flags) }
+            str.apply { setSpan(it, if (start < 0) 0 else start, if (end < 0) length else end, flags) }
         }
         is List<*> -> what.forEach {
-            str.apply { setSpan(it, start, end, flags) }
+            str.apply { setSpan(it, if (start < 0) 0 else start, if (end < 0) length else end, flags) }
         }
-        else -> str.apply { setSpan(what, start, end, flags) }
+        else -> str.apply { setSpan(what, if (start < 0) 0 else start, if (end < 0) length else end, flags) }
     }
     return str
 }
 
 /**
- * 添加字符串并添加效果, 同时保留以前文字效果
- * @param text 可以是[android.text.Spanned]或[CharSequence]
- * @param what 文字效果, 如果为数组或者集合则设置多个
- * @param flags 参考 [Spanned.SPAN_EXCLUSIVE_EXCLUSIVE]
- *
- * @return 如果接受者不为[SpannableStringBuilder]则将返回一个新的对象
- */
-@JvmOverloads
-fun CharSequence.addSpan(text: CharSequence, what: Any? = null, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE): CharSequence {
-    val spannable = when (what) {
-        is Array<*> -> what.fold(text) { s, span ->
-            s.setSpan(span, flags)
-        }
-        is List<*> -> what.fold(text) { s, span ->
-            s.setSpan(span, flags)
-        }
-        else -> text.setSpan(what, flags)
-    }
-    val spannableStringBuilder = when (this) {
-        is SpannableStringBuilder -> append(spannable)
-        else -> SpannableStringBuilder(this).append(spannable)
-    }
-    return spannableStringBuilder
-}
-
-/**
  * 添加字符串到指定位置并添加效果, 同时保留以前文字效果
- * @param where 插入位置
  * @param text 可以是[android.text.Spanned]或[CharSequence]
  * @param what 文字效果, 如果为数组或者集合则设置多个
  * @param flags 参考 [Spanned.SPAN_EXCLUSIVE_EXCLUSIVE]
+ * @param where 插入位置
  *
  * @return 如果接受者不为[SpannableStringBuilder]则将返回一个新的对象
  */
 @JvmOverloads
-fun CharSequence.addSpan(where: Int, text: CharSequence, what: Any? = null, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE): CharSequence {
+fun CharSequence.addSpan(text: CharSequence, what: Any? = null, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE, where: Int = DEFAULT_INDEX): CharSequence {
     val spannable = when (what) {
         is Array<*> -> what.fold(text) { s, span ->
             s.setSpan(span, flags)
@@ -121,8 +84,12 @@ fun CharSequence.addSpan(where: Int, text: CharSequence, what: Any? = null, flag
         else -> text.setSpan(what, flags)
     }
     val spannableStringBuilder = when (this) {
-        is SpannableStringBuilder -> insert(where, spannable)
-        else -> SpannableStringBuilder(this).insert(where, spannable)
+        is SpannableStringBuilder -> this
+        else -> SpannableStringBuilder(this)
+    }.run {
+        if (where < 0) {
+            append(spannable)
+        } else insert(where, spannable)
     }
     return spannableStringBuilder
 }
@@ -137,18 +104,14 @@ fun CharSequence.addSpan(where: Int, text: CharSequence, what: Any? = null, flag
  * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
  * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
  * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
- * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
- * 6. 和[replace]函数不同的时本函数会保留原有[android.text.Spanned]的效果
+ * 5. 并且本函数支持反向引用捕获组, 使用方法等同于Regex: $捕获组索引
+ * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
  *
  * @return 如果没有匹配任何项会返回原来的[CharSequence]
  */
 @JvmOverloads
 fun CharSequence.replaceSpan(oldValue: String, ignoreCase: Boolean = false, replacement: (MatchResult) -> Any?): CharSequence {
-    val regex = if (ignoreCase) {
-        Regex.escape(oldValue).toRegex(RegexOption.IGNORE_CASE)
-    } else {
-        Regex.escape(oldValue).toRegex()
-    }
+    val regex = oldValue.createReplaceStringRegex(ignoreCase)
     return replaceSpan(regex, replacement = replacement)
 }
 
@@ -162,8 +125,8 @@ fun CharSequence.replaceSpan(oldValue: String, ignoreCase: Boolean = false, repl
  * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
  * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
  * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
- * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
- * 6. 和[replace]函数不同的时本函数会保留原有[android.text.Spanned]的效果
+ * 5. 并且本函数支持反向引用捕获组, 使用方法等同于Regex: $捕获组索引
+ * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
  *
  * @return 如果没有匹配任何项会返回原来的[CharSequence]
  */
@@ -225,18 +188,14 @@ fun CharSequence.replaceSpan(regex: Regex, quoteGroup: Boolean = false, replacem
  * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
  * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
  * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
- * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
- * 6. 和[replace]函数不同的时本函数会保留原有[android.text.Spanned]的效果
+ * 5. 并且本函数支持反向引用捕获组, 使用方法等同于Regex: $捕获组索引
+ * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
  *
  * @return 如果没有匹配任何项会返回原来的[CharSequence]
  */
 @JvmOverloads
 fun CharSequence.replaceSpanFirst(oldValue: String, ignoreCase: Boolean = false, replacement: (MatchResult) -> Any?): CharSequence {
-    val regex = if (ignoreCase) {
-        Regex.escape(oldValue).toRegex(RegexOption.IGNORE_CASE)
-    } else {
-        Regex.escape(oldValue).toRegex()
-    }
+    val regex = oldValue.createReplaceStringRegex(ignoreCase)
     return replaceSpanFirst(regex, replacement = replacement)
 }
 
@@ -250,8 +209,8 @@ fun CharSequence.replaceSpanFirst(oldValue: String, ignoreCase: Boolean = false,
  * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
  * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
  * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
- * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
- * 6. 和[replace]函数不同的时本函数会保留原有[android.text.Spanned]的效果
+ * 5. 并且本函数支持反向引用捕获组, 使用方法等同于Regex: $捕获组索引
+ * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
  *
  * @return 如果没有匹配任何项会返回原来的[CharSequence]
  */
@@ -310,18 +269,14 @@ fun CharSequence.replaceSpanFirst(regex: Regex, quoteGroup: Boolean = false, rep
  * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
  * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
  * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
- * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
- * 6. 和[replace]函数不同的时本函数会保留原有[android.text.Spanned]的效果
+ * 5. 并且本函数支持反向引用捕获组, 使用方法等同于Regex: $捕获组索引
+ * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
  *
  * @return 如果没有匹配任何项会返回原来的[CharSequence]
  */
 @JvmOverloads
 fun CharSequence.replaceSpanLast(oldValue: String, ignoreCase: Boolean = false, replacement: (MatchResult) -> Any?): CharSequence {
-    val regex = if (ignoreCase) {
-        Regex.escape(oldValue).toRegex(RegexOption.IGNORE_CASE)
-    } else {
-        Regex.escape(oldValue).toRegex()
-    }
+    val regex = oldValue.createReplaceStringRegex(ignoreCase)
     return replaceSpanLast(regex, replacement = replacement)
 }
 
@@ -335,8 +290,8 @@ fun CharSequence.replaceSpanLast(oldValue: String, ignoreCase: Boolean = false, 
  * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
  * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
  * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
- * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
- * 6. 和[replace]函数不同的时本函数会保留原有[android.text.Spanned]的效果
+ * 5. 并且本函数支持反向引用捕获组, 使用方法等同于Regex: $捕获组索引
+ * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
  *
  * @return 如果没有匹配任何项会返回原来的[CharSequence]
  */
