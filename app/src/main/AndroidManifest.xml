@@ -19,6 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ExtensionActivity" />
+        <activity android:name=".JavaActivity" />
     </application>
 
 </manifest>

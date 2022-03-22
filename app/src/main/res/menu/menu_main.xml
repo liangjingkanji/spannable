@@ -3,4 +3,8 @@
     <item
         android:id="@+id/menu_extension"
         android:title="扩展方法Sample" />
+
+    <item
+        android:id="@+id/menu_java"
+        android:title="Java使用Sample" />
 </menu>

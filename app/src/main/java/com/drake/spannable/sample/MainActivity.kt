@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity() {
         super.onContextItemSelected(item)
         when(item.itemId){
             R.id.menu_extension -> startActivity(Intent(this, ExtensionActivity::class.java))
+            R.id.menu_java -> startActivity(Intent(this, JavaActivity::class.java))
         }
         return true
     }
