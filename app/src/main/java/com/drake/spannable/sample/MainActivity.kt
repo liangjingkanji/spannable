@@ -32,6 +32,7 @@ import com.drake.spannable.replaceSpan
 import com.drake.spannable.replaceSpanFirst
 import com.drake.spannable.sample.databinding.ActivityMainBinding
 import com.drake.spannable.setSpan
+import com.drake.spannable.span.CenterImageSpan
 import com.drake.spannable.span.ColorSpan
 import com.drake.spannable.span.HighlightSpan
 
@@ -81,12 +82,12 @@ class MainActivity : AppCompatActivity() {
             .addSpan(" 1000+ 人付款")
 
         // 通过替换方式展示价格
-        binding.tv6.text = "¥39.9 1000+ 人付款"
+        binding.tv6.text = "¥39.9 1000+ 人付款 "
             .replaceSpan("¥[\\d\\.]+".toRegex()) { // 匹配价格颜色(包含货币符号)
                 ColorSpan("#ed6a2c")
             }.replaceSpanFirst("[\\d\\.]+".toRegex()) { // 匹配价格字号
                 AbsoluteSizeSpan(18, true)
-            }
+            }.addSpan("image", CenterImageSpan(this, R.drawable.ic_launcher_round).setDrawableSize(80, 80)) // 设置一个80像素宽高的图标
     }
 }
 
