@@ -16,6 +16,7 @@
 
 package com.drake.spannable.sample
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
@@ -24,6 +25,8 @@ import android.text.method.LinkMovementMethod
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.StyleSpan
 import android.text.style.URLSpan
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.drake.spannable.addSpan
@@ -32,6 +35,7 @@ import com.drake.spannable.replaceSpan
 import com.drake.spannable.replaceSpanFirst
 import com.drake.spannable.sample.databinding.ActivityMainBinding
 import com.drake.spannable.setSpan
+import com.drake.spannable.span.CenterImageSpan
 import com.drake.spannable.span.ColorSpan
 import com.drake.spannable.span.HighlightSpan
 
@@ -40,9 +44,27 @@ class MainActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        super.onContextItemSelected(item)
+        when(item.itemId){
+            R.id.menu_extension -> startActivity(Intent(this, ExtensionActivity::class.java))
+        }
+        return true
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.subtitle = this.javaClass.simpleName
+
+        // 图片Span
+        binding.tvImage.text = " ".setSpan(CenterImageSpan(this, R.mipmap.ic_launcher))
 
         // 替换Span
         binding.tv.movementMethod = ClickableMovementMethod.getInstance()
@@ -52,18 +74,27 @@ class MainActivity : AppCompatActivity() {
 
         // 自动设置网址
         binding.tv1.movementMethod = LinkMovementMethod()
-        binding.tv1.text = "打开官网: https://github.com/" // 地址/邮箱/手机号码等匹配可以不使用Span, 可以在xml中指定autoLink属性, 会有点击背景色
+        binding.tv1.text =
+            "打开官网: https://github.com/" // 地址/邮箱/手机号码等匹配可以不使用Span, 可以在xml中指定autoLink属性, 会有点击背景色
 
         // 使用正则匹配
         binding.tv2.movementMethod = ClickableMovementMethod.getInstance() // 保证没有点击背景色
         binding.tv2.text = "我们可以艾特用户@刘强东 或者创建#热门标签"
             .replaceSpan("@[^@]+?(?=\\s|\$)".toRegex()) { matchResult ->
                 HighlightSpan("#ed6a2c") {
-                    Toast.makeText(this@MainActivity, "点击用户 ${matchResult.value}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@MainActivity,
+                        "点击用户 ${matchResult.value}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }.replaceSpan("#[^#]+?(?=\\s|\$)".toRegex()) { matchResult ->
                 HighlightSpan("#4a70d2", Typeface.defaultFromStyle(Typeface.BOLD)) {
-                    Toast.makeText(this@MainActivity, "点击标签 ${matchResult.value}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@MainActivity,
+                        "点击标签 ${matchResult.value}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
@@ -73,7 +104,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         // 添加一个字符串+Span, 注意括号保证函数执行优先级
-        binding.tv4.text = ("隐私权政策 | 许可 | 品牌指南" + " | ").addSpan("官网", listOf(ColorSpan(Color.BLUE), StyleSpan(Typeface.BOLD)))
+        binding.tv4.text = ("隐私权政策 | 许可 | 品牌指南" + " | ").addSpan(
+            "官网",
+            listOf(ColorSpan(Color.BLUE), StyleSpan(Typeface.BOLD))
+        )
 
         // 通过拼接方式展示价格
         binding.tv5.text = "¥".setSpan(ColorSpan("#ed6a2c"))
