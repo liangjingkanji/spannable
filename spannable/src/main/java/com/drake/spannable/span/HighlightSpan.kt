@@ -24,6 +24,7 @@ import android.text.style.ClickableSpan
 import android.view.View
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
 
 /**
  * 创建字体颜色/字体样式/可点击效果
@@ -32,7 +33,7 @@ import androidx.annotation.ColorRes
  * @param onClick 点击事件
  */
 class HighlightSpan(
-    @ColorInt val color: Int,
+    @ColorInt val color: Int? = null,
     val typeface: Typeface? = null,
     val onClick: ((View) -> Unit)? = null
 ) : ClickableSpan() {
@@ -44,7 +45,7 @@ class HighlightSpan(
      * @param onClick 点击事件
      */
     constructor(
-        color: String,
+        color: String? = null,
         typeface: Typeface? = null,
         onClick: ((View) -> Unit)? = null
     ) : this(Color.parseColor(color), typeface, onClick)
@@ -60,13 +61,11 @@ class HighlightSpan(
         @ColorRes colorRes: Int,
         typeface: Typeface? = null,
         onClick: ((View) -> Unit)? = null
-    ) : this(context.resources.getColor(colorRes), typeface, onClick)
+    ) : this(ContextCompat.getColor(context, colorRes), typeface, onClick)
 
     override fun updateDrawState(ds: TextPaint) {
-        ds.color = color
-        typeface?.let {
-            ds.typeface = typeface
-        }
+        color?.let(ds::setColor)
+        typeface?.let(ds::setTypeface)
     }
 
     override fun onClick(widget: View) {
