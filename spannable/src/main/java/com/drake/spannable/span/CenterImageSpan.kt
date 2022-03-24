@@ -10,7 +10,7 @@ import android.text.style.ImageSpan
 import java.lang.ref.WeakReference
 
 /**
- * 居中文字显示图片
+ * 垂直居中文字显示图片
  * @see setDrawableSize 设置图片尺寸
  */
 class CenterImageSpan : ImageSpan {

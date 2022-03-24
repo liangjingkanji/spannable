@@ -6,8 +6,9 @@ import android.text.style.ForegroundColorSpan
 import androidx.annotation.ColorRes
 
 /**
- * 快速创建[ForegroundColorSpan]
+ * 快速渲染文字颜色
  * @param color 字体颜色
+ * @see ForegroundColorSpan
  */
 class ColorSpan(color: Int) : ForegroundColorSpan(color) {
     constructor(color: String) : this(Color.parseColor(color))
