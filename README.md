@@ -43,6 +43,16 @@
 | replaceSpan      | 替换/正则替换Span或字符串               |
 | replaceSpanFirst/replaceSpanLast | 替换/正则替换第一个/最后一个匹配项的Span或字符串 |
 
+## Span
+本框架会收集一些常用的Span效果实现
+
+| Span | 描述 |
+|-|-|
+| CenterImageSpan | 垂直居中文字显示图片/设置图片宽高 |
+| ColorSpan | 快速创建文字颜色 |
+| HighlightSpan | 创建字体颜色/字体样式/可点击效果 |
+| ClickableMovementMethod | 等效LinkMovementMethod, 但没有点击背景色 |
+
 ## 安装
 
 添加远程仓库根据创建项目的 Android Studio 版本有所不同
