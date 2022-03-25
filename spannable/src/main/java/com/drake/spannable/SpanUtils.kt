@@ -138,7 +138,7 @@ fun CharSequence.addSpan(where: Int, text: CharSequence, what: Any? = null, flag
  * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
  * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
  * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
- * 6. 和[replace]函数不同的时本函数会保留原有[android.text.Spanned]的效果
+ * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
  *
  * @return 如果没有匹配任何项会返回原来的[CharSequence]
  */
@@ -163,7 +163,7 @@ fun CharSequence.replaceSpan(oldValue: String, ignoreCase: Boolean = false, repl
  * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
  * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
  * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
- * 6. 和[replace]函数不同的时本函数会保留原有[android.text.Spanned]的效果
+ * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
  *
  * @return 如果没有匹配任何项会返回原来的[CharSequence]
  */
@@ -229,7 +229,7 @@ fun CharSequence.replaceSpan(regex: Regex, quoteGroup: Boolean = false, replacem
  * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
  * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
  * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
- * 6. 和[replace]函数不同的时本函数会保留原有[android.text.Spanned]的效果
+ * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
  *
  * @return 如果没有匹配任何项会返回原来的[CharSequence]
  */
@@ -254,7 +254,7 @@ fun CharSequence.replaceSpanFirst(oldValue: String, ignoreCase: Boolean = false,
  * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
  * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
  * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
- * 6. 和[replace]函数不同的时本函数会保留原有[android.text.Spanned]的效果
+ * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
  *
  * @return 如果没有匹配任何项会返回原来的[CharSequence]
  */
@@ -317,7 +317,7 @@ fun CharSequence.replaceSpanFirst(regex: Regex, quoteGroup: Boolean = false, rep
  * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
  * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
  * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
- * 6. 和[replace]函数不同的时本函数会保留原有[android.text.Spanned]的效果
+ * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
  *
  * @return 如果没有匹配任何项会返回原来的[CharSequence]
  */
@@ -342,7 +342,7 @@ fun CharSequence.replaceSpanLast(oldValue: String, ignoreCase: Boolean = false, 
  * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
  * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
  * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
- * 6. 和[replace]函数不同的时本函数会保留原有[android.text.Spanned]的效果
+ * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
  *
  * @return 如果没有匹配任何项会返回原来的[CharSequence]
  */
