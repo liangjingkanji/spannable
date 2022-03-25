@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity() {
                 ColorSpan("#ed6a2c")
             }.replaceSpanFirst("[\\d\\.]+".toRegex()) { // 匹配价格字号
                 AbsoluteSizeSpan(18, true)
-            }.addSpan("image", CenterImageSpan(this, R.drawable.ic_launcher_round).setDrawableSize(80, 80)) // 设置一个80像素宽高的图标
+            }.addSpan("image", CenterImageSpan(this, R.mipmap.ic_launcher_round).setDrawableSize(80, 80)) // 设置一个80像素宽高的图标
     }
 }
 
