@@ -169,7 +169,7 @@ fun CharSequence.replaceSpan(oldValue: String, ignoreCase: Boolean = false, repl
  */
 @JvmOverloads
 fun CharSequence.replaceSpan(regex: Regex, quoteGroup: Boolean = false, replacement: (MatchResult) -> Any?): CharSequence {
-    val spanBuilder = SpannableStringBuilder(this)
+    var spanBuilder = if (this is Spannable) this else SpannableStringBuilder(this)
     var offset = 0
     regex.findAll(this).forEach { matchResult ->
         val range = matchResult.range
@@ -205,7 +205,10 @@ fun CharSequence.replaceSpan(regex: Regex, quoteGroup: Boolean = false, replacem
                         }
                     }
                     val matchLength = matchResult.value.length
-                    spanBuilder.replace(range.first + offset, range.first + offset + matchLength, adjustReplacement)
+                    if (spanBuilder !is SpannableStringBuilder){
+                        spanBuilder = SpannableStringBuilder(spanBuilder)
+                    }
+                    (spanBuilder as SpannableStringBuilder).replace(range.first + offset, range.first + offset + matchLength, adjustReplacement)
                     offset += adjustReplacement.length - matchLength
                 }
                 else -> spanBuilder[range.first, range.last + 1] = spanned
@@ -258,7 +261,7 @@ fun CharSequence.replaceSpanFirst(oldValue: String, ignoreCase: Boolean = false,
 @JvmOverloads
 fun CharSequence.replaceSpanFirst(regex: Regex, quoteGroup: Boolean = false, replacement: (MatchResult) -> Any?): CharSequence {
     val matchResult = regex.find(this) ?: return this
-    val spanBuilder = SpannableStringBuilder(this)
+    var spanBuilder = if (this is Spannable) this else SpannableStringBuilder(this)
     val range = matchResult.range
     replacement(matchResult)?.let { spanned ->
         when (spanned) {
@@ -292,7 +295,10 @@ fun CharSequence.replaceSpanFirst(regex: Regex, quoteGroup: Boolean = false, rep
                     }
                 }
                 val matchLength = matchResult.value.length
-                spanBuilder.replace(range.first, range.first + matchLength, adjustReplacement)
+                if (spanBuilder !is SpannableStringBuilder){
+                    spanBuilder = SpannableStringBuilder(spanBuilder)
+                }
+                (spanBuilder as SpannableStringBuilder).replace(range.first, range.first + matchLength, adjustReplacement)
             }
             else -> spanBuilder[range.first, range.last + 1] = spanned
         }
@@ -343,7 +349,7 @@ fun CharSequence.replaceSpanLast(oldValue: String, ignoreCase: Boolean = false, 
 @JvmOverloads
 fun CharSequence.replaceSpanLast(regex: Regex, quoteGroup: Boolean = false, replacement: (MatchResult) -> Any?): CharSequence {
     val matchResult = regex.findAll(this).lastOrNull() ?: return this
-    val spanBuilder = SpannableStringBuilder(this)
+    var spanBuilder = if (this is Spannable) this else SpannableStringBuilder(this)
     val range = matchResult.range
     replacement(matchResult)?.let { spanned ->
         when (spanned) {
@@ -377,7 +383,10 @@ fun CharSequence.replaceSpanLast(regex: Regex, quoteGroup: Boolean = false, repl
                     }
                 }
                 val matchLength = matchResult.value.length
-                spanBuilder.replace(range.first, range.first + matchLength, adjustReplacement)
+                if (spanBuilder !is SpannableStringBuilder){
+                    spanBuilder = SpannableStringBuilder(spanBuilder)
+                }
+                (spanBuilder as SpannableStringBuilder).replace(range.first, range.first + matchLength, adjustReplacement)
             }
             else -> spanBuilder[range.first, range.last + 1] = spanned
         }
