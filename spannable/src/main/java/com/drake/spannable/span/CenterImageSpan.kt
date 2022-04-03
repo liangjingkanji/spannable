@@ -10,14 +10,24 @@ import android.text.style.ImageSpan
 import java.lang.ref.WeakReference
 
 /**
- * 垂直居中文字显示图片
- * @see setDrawableSize 设置图片尺寸
+ * 解决ImageSpan的垂直居中对齐要求api23以上
+ * 相对ImageSpan可以控制图片宽高固定值
+ * 需应对更复杂的图片加载需求请使用[GlideImageSpan]
  */
 class CenterImageSpan : ImageSpan {
 
+    /** 图片宽度 */
+    var drawableWidth: Int = 0
+        private set
+
+    /** 图片高度 */
+    var drawableHeight: Int = 0
+        private set
+
     private var drawableRef: WeakReference<Drawable>? = null
-    private val drawableCache: Drawable
-        get() = drawableRef?.get() ?: drawable.apply {
+
+    override fun getDrawable(): Drawable {
+        return drawableRef?.get() ?: super.getDrawable().apply {
             setBounds(
                 0, 0,
                 if (drawableWidth == -1) intrinsicWidth else drawableWidth,
@@ -25,20 +35,7 @@ class CenterImageSpan : ImageSpan {
             )
             drawableRef = WeakReference(this)
         }
-
-    /**
-     * -1 等于 [Drawable.getIntrinsicWidth], 即图片原始宽高
-     * @see [setDrawableSize]
-     */
-    var drawableWidth: Int = -1
-        private set
-
-    /**
-     * -1 等于 [Drawable.getIntrinsicHeight], 即图片原始宽高
-     * @see [setDrawableSize]
-     */
-    var drawableHeight: Int = -1
-        private set
+    }
 
     constructor(drawable: Drawable) : super(drawable)
     constructor(drawable: Drawable, source: String) : super(drawable, source)
@@ -53,15 +50,17 @@ class CenterImageSpan : ImageSpan {
         end: Int,
         fm: Paint.FontMetricsInt?
     ): Int {
-        fm?.let {
-            val fontHeight = paint.fontMetricsInt.descent - paint.fontMetricsInt.ascent
-            val imageHeight = drawableCache.bounds.height()
-            it.ascent = paint.fontMetricsInt.ascent - ((imageHeight - fontHeight) / 2.0f).toInt()
-            it.top = it.ascent
-            it.descent = it.ascent + imageHeight
-            it.bottom = it.descent
+        val bounds = drawable.bounds
+        if (fm != null) {
+            val fontMetricsInt = paint.fontMetricsInt
+            val fontHeight = fontMetricsInt.descent - fontMetricsInt.ascent
+            val imageHeight = bounds.height()
+            fm.ascent = fontMetricsInt.ascent - ((imageHeight - fontHeight) / 2.0f).toInt()
+            fm.top = fm.ascent
+            fm.descent = fm.ascent + imageHeight
+            fm.bottom = fm.descent
         }
-        return drawableCache.bounds.right
+        return bounds.right
     }
 
     override fun draw(
@@ -75,18 +74,39 @@ class CenterImageSpan : ImageSpan {
         bottom: Int,
         paint: Paint
     ) {
-        val fontHeight = paint.fontMetricsInt.descent - paint.fontMetricsInt.ascent
-        val imageAscent = paint.fontMetricsInt.ascent - ((drawableCache.bounds.height() - fontHeight) / 2.0f).toInt()
         canvas.save()
-        canvas.translate(x, (y + imageAscent).toFloat())
-        drawableCache.draw(canvas)
+        var transY = bottom - drawable.bounds.bottom
+        val fontMetricsInt = paint.fontMetricsInt
+        if (align == Align.BASELINE) {
+            transY -= fontMetricsInt.descent
+        } else if (align == Align.CENTER) {
+            transY = (bottom - top) / 2 - drawable.bounds.height() / 2
+        }
+        canvas.translate(x, transY.toFloat())
+        drawable.draw(canvas)
         canvas.restore()
+    }
+
+
+    enum class Align {
+        BASELINE,
+        CENTER,
+        BOTTOM
+    }
+
+    private var align: Align = Align.CENTER
+
+    /**
+     * 设置图片垂直对其方式
+     */
+    fun setAlign(align: Align) = apply {
+        this.align = align
     }
 
     /**
      * 设置图片宽高
      */
-    fun setDrawableSize(width: Int, height: Int = width): CenterImageSpan = apply {
+    fun setDrawableSize(width: Int, height: Int = width) = apply {
         this.drawableWidth = width
         this.drawableHeight = height
         drawableRef?.clear()
