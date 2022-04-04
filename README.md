@@ -87,7 +87,7 @@ dependencyResolutionManagement {
 然后在 module 的 build.gradle 添加依赖框架
 
 ```groovy
-implementation 'com.github.liangjingkanji:spannable:1.0.5'
+implementation 'com.github.liangjingkanji:spannable:1.0.6'
 ```
 
 
