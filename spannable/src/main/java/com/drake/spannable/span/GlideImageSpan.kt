@@ -154,9 +154,9 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
      * 设置图片宽高
      * 如果参数值为0则表示使用图片原始宽高
      */
-    fun setDrawableSize(width: Int, height: Int = width, dimension: Boolean = true) = apply {
-        this.drawableWidth = if (dimension) dp2px(width) else width
-        this.drawableHeight = if (dimension) dp2px(height) else height
+    fun setDrawableSize(width: Int, height: Int = width, dp: Boolean = false) = apply {
+        this.drawableWidth = if (dp) dp2px(width) else width
+        this.drawableHeight = if (dp) dp2px(height) else height
         drawableRef.set(null)
     }
 
