@@ -28,11 +28,15 @@ class CenterImageSpan : ImageSpan {
 
     override fun getDrawable(): Drawable {
         return drawableRef?.get() ?: super.getDrawable().apply {
-            setBounds(
-                0, 0,
-                if (drawableWidth == -1) intrinsicWidth else drawableWidth,
-                if (drawableHeight == -1) intrinsicHeight else drawableHeight
-            )
+            val ratio = intrinsicWidth.toDouble() / intrinsicHeight.toDouble()
+            drawableWidth = if (drawableWidth > 0) drawableWidth else intrinsicWidth
+            drawableHeight = if (drawableHeight > 0) drawableHeight else intrinsicHeight
+            if (drawableWidth > drawableHeight) {
+                drawableWidth = (drawableHeight * ratio).toInt()
+            } else if (drawableWidth < drawableHeight) {
+                drawableHeight = (drawableWidth / ratio).toInt()
+            }
+            setBounds(0, 0, drawableWidth, drawableHeight)
             drawableRef = WeakReference(this)
         }
     }
