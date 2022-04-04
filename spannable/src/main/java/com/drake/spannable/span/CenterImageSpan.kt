@@ -8,11 +8,16 @@ import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.text.style.ImageSpan
+import com.drake.spannable.span.GlideImageSpan.Align
 import java.lang.ref.WeakReference
 
 /**
- * 解决ImageSpan的垂直居中对齐要求api23以上
- * 相对ImageSpan可以控制图片宽高固定值
+ * 图片完全垂直居中对齐文字(ImageSpan无法真正垂直居中)
+ * 垂直居中文字不要求Api23以上
+ * 设置图片宽高且保持固定比例
+ *
+ * 图片默认垂直居中对齐文字
+ *
  * 需应对更复杂的图片加载需求请使用[GlideImageSpan]
  */
 class CenterImageSpan : ImageSpan {
@@ -103,6 +108,7 @@ class CenterImageSpan : ImageSpan {
 
     /**
      * 设置图片垂直对其方式
+     * 图片默认垂直居中对齐文字: [Align.CENTER]
      */
     fun setAlign(align: Align) = apply {
         this.align = align
