@@ -34,6 +34,7 @@ import com.drake.spannable.sample.databinding.ActivityMainBinding
 import com.drake.spannable.setSpan
 import com.drake.spannable.span.CenterImageSpan
 import com.drake.spannable.span.ColorSpan
+import com.drake.spannable.span.GlideImageSpan
 import com.drake.spannable.span.HighlightSpan
 
 
@@ -80,6 +81,7 @@ class MainActivity : AppCompatActivity() {
         binding.tv5.text = "¥".setSpan(ColorSpan("#ed6a2c"))
             .addSpan("39.9", arrayOf(ColorSpan("#ed6a2c"), AbsoluteSizeSpan(18, true)))
             .addSpan(" 1000+ 人付款")
+            .addSpan("image", CenterImageSpan(this, R.drawable.ic_touch).setDrawableSize(20, dp = true))
 
         // 通过替换方式展示价格
         binding.tv6.text = "¥39.9 1000+ 人付款 "
@@ -87,7 +89,7 @@ class MainActivity : AppCompatActivity() {
                 ColorSpan("#ed6a2c")
             }.replaceSpanFirst("[\\d\\.]+".toRegex()) { // 匹配价格字号
                 AbsoluteSizeSpan(18, true)
-            }.addSpan("image", CenterImageSpan(this, R.mipmap.ic_launcher_round).setDrawableSize(80, 80)) // 设置一个80像素宽高的图标
+            }.addSpan("image", GlideImageSpan(binding.tv6, "https://s1.hdslb.com/bfs/static/blive/blfe-dynamic-web/static/img/no-login.9be609c5.png").setAlign(GlideImageSpan.Align.BOTTOM).setDrawableSize(50, dp = true)) // 设置一个80像素宽高的图标
     }
 }
 

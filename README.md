@@ -48,7 +48,8 @@
 
 | Span | 描述 |
 |-|-|
-| CenterImageSpan | 垂直居中文字显示图片/设置图片宽高 |
+| CenterImageSpan | 垂直对齐方式/图片宽高/固定图片比例 |
+| GlideImageSpan | 加载网络图片/垂直对齐方式/图片宽高/固定图片比例 |
 | ColorSpan | 快速创建文字颜色 |
 | HighlightSpan | 创建字体颜色/字体样式/可点击效果 |
 | ClickableMovementMethod | 等效LinkMovementMethod, 但没有点击背景色 |
