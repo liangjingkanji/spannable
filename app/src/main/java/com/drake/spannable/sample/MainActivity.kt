@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
         // 通过替换方式展示价格
         binding.tv6.text = "¥39.9 1000+ 人付款 "
             .replaceSpan("¥[\\d\\.]+".toRegex()) { // 匹配价格颜色(包含货币符号)
-                ColorSpan("#ed6a2c")
+                ColorSpan("#479fd1")
             }.replaceSpanFirst("[\\d\\.]+".toRegex()) { // 匹配价格字号
                 AbsoluteSizeSpan(18, true)
             }.addSpan("image", GlideImageSpan(binding.tv6, "https://s1.hdslb.com/bfs/static/blive/blfe-dynamic-web/static/img/no-login.9be609c5.png").setAlign(GlideImageSpan.Align.BOTTOM).setDrawableSize(50, dp = true)) // 设置一个80像素宽高的图标
