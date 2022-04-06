@@ -65,9 +65,21 @@ class CenterImageSpan : ImageSpan {
             val fontMetricsInt = paint.fontMetricsInt
             val fontHeight = fontMetricsInt.descent - fontMetricsInt.ascent
             val imageHeight = bounds.height()
-            fm.ascent = fontMetricsInt.ascent - ((imageHeight - fontHeight) / 2.0f).toInt()
+            when (align) {
+                Align.CENTER -> {
+                    fm.ascent = fontMetricsInt.ascent - ((imageHeight - fontHeight) / 2.0f).toInt()
+                    fm.descent = fm.ascent + imageHeight
+                }
+                Align.BASELINE -> {
+                    fm.ascent = fontMetricsInt.ascent - (imageHeight - fontHeight + (fontMetricsInt.descent / 2))
+                    fm.descent = 0
+                }
+                Align.BOTTOM -> {
+                    fm.ascent = fontMetricsInt.ascent - (imageHeight - fontHeight)
+                    fm.descent = 0
+                }
+            }
             fm.top = fm.ascent
-            fm.descent = fm.ascent + imageHeight
             fm.bottom = fm.descent
         }
         return bounds.right

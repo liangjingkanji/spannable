@@ -49,9 +49,21 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
             val fontMetricsInt = paint.fontMetricsInt
             val fontHeight = fontMetricsInt.descent - fontMetricsInt.ascent
             val imageHeight = drawableHeight.takeIf { it > 0 } ?: bounds?.height() ?: 0
-            fm.ascent = fontMetricsInt.ascent - ((imageHeight - fontHeight) / 2.0f).toInt()
+            when (align) {
+                Align.CENTER -> {
+                    fm.ascent = fontMetricsInt.ascent - ((imageHeight - fontHeight) / 2.0f).toInt()
+                    fm.descent = fm.ascent + imageHeight
+                }
+                Align.BASELINE -> {
+                    fm.ascent = fontMetricsInt.ascent - (imageHeight - fontHeight + (fontMetricsInt.descent / 2))
+                    fm.descent = 0
+                }
+                Align.BOTTOM -> {
+                    fm.ascent = fontMetricsInt.ascent - (imageHeight - fontHeight)
+                    fm.descent = 0
+                }
+            }
             fm.top = fm.ascent
-            fm.descent = fm.ascent + imageHeight
             fm.bottom = fm.descent
         }
         return bounds?.right ?: 0
