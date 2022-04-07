@@ -26,6 +26,7 @@ import android.text.style.StyleSpan
 import android.text.style.URLSpan
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.drake.engine.utils.dp
 import com.drake.spannable.addSpan
 import com.drake.spannable.movement.ClickableMovementMethod
 import com.drake.spannable.replaceSpan
@@ -81,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         binding.tv5.text = "¥".setSpan(ColorSpan("#ed6a2c"))
             .addSpan("39.9", arrayOf(ColorSpan("#ed6a2c"), AbsoluteSizeSpan(18, true)))
             .addSpan(" 1000+ 人付款")
-            .addSpan("image", CenterImageSpan(this, R.drawable.ic_touch).setDrawableSize(20, dp = true))
+            .addSpan("image", CenterImageSpan(this, R.drawable.ic_touch).setDrawableSize(20.dp))
 
         // 通过替换方式展示价格
         binding.tv6.text = "¥39.9 1000+ 人付款 "
@@ -89,7 +90,7 @@ class MainActivity : AppCompatActivity() {
                 ColorSpan("#479fd1")
             }.replaceSpanFirst("[\\d\\.]+".toRegex()) { // 匹配价格字号
                 AbsoluteSizeSpan(18, true)
-            }.addSpan("image", GlideImageSpan(binding.tv6, "https://s1.hdslb.com/bfs/static/blive/blfe-dynamic-web/static/img/no-login.9be609c5.png").setAlign(GlideImageSpan.Align.BOTTOM).setDrawableSize(50, dp = true)) // 设置一个80像素宽高的图标
+            }.addSpan("image", GlideImageSpan(binding.tv6, "https://s1.hdslb.com/bfs/static/blive/blfe-dynamic-web/static/img/no-login.9be609c5.png").setAlign(GlideImageSpan.Align.BOTTOM).setDrawableSize(50.dp)) // 设置一个80像素宽高的图标
     }
 }
 

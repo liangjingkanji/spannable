@@ -1,7 +1,6 @@
 package com.drake.spannable.span
 
 import android.content.Context
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -130,14 +129,10 @@ class CenterImageSpan : ImageSpan {
      * 设置图片宽高
      * 如果参数值为0则表示使用图片原始宽高
      */
-    fun setDrawableSize(width: Int, height: Int = width, dp: Boolean = false) = apply {
-        this.drawableWidth = if (dp) dp2px(width) else width
-        this.drawableHeight = if (dp) dp2px(height) else height
+    fun setDrawableSize(width: Int, height: Int = width) = apply {
+        this.drawableWidth = width
+        this.drawableHeight = height
         drawableRef?.clear()
-    }
-
-    private fun dp2px(dp: Int): Int {
-        return (dp * Resources.getSystem().displayMetrics.density).toInt()
     }
 
 }
