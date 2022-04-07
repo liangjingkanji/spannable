@@ -48,14 +48,14 @@
 | Span | 描述 |
 |-|-|
 | CenterImageSpan | 垂直对齐方式/图片宽高/固定图片比例 |
-| GlideImageSpan | 加载网络图片/垂直对齐方式/图片宽高/固定图片比例 |
+| GlideImageSpan | 加载网络图片/垂直对齐方式/图片宽高/固定图片比例, 要求依赖[Glide](https://github.com/bumptech/glide) |
 | ColorSpan | 快速创建文字颜色 |
 | HighlightSpan | 创建字体颜色/字体样式/可点击效果 |
 | ClickableMovementMethod | 等效LinkMovementMethod, 但没有点击背景色 |
 
 
 
-本工具将保持简单和扩展性, 如果你想使用dsl构建span可以使用[SpanableX](https://github.com/TxcA/SpannableX)
+本工具将保持简单和扩展性, 如果你想使用dsl构建span可以使用[SpannableX](https://github.com/TxcA/SpannableX)
 
 ## 安装
 
