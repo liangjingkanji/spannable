@@ -32,6 +32,14 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
     var drawableHeight: Int = 0
         private set
 
+    /** 图片左间距 */
+    var marginLeft: Int = 0
+        private set
+
+    /** 图片右间距 */
+    var marginRight: Int = 0
+        private set
+
     private var requestOption: RequestOptions = RequestOptions()
     private var drawableRef: AtomicReference<Drawable> = AtomicReference()
 
@@ -65,7 +73,7 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
             fm.top = fm.ascent
             fm.bottom = fm.descent
         }
-        return bounds?.right ?: 0
+        return bounds?.right ?: 0 + marginLeft + marginRight
     }
 
     override fun draw(
@@ -88,7 +96,7 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
             } else if (align == Align.CENTER) {
                 transY = (bottom - top) / 2 - drawable.bounds.height() / 2
             }
-            canvas.translate(x, transY.toFloat())
+            canvas.translate(x + marginLeft, transY.toFloat())
             drawable.draw(canvas)
             canvas.restore()
         }
@@ -168,6 +176,13 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
     fun setDrawableSize(width: Int, height: Int = width) = apply {
         this.drawableWidth = width
         this.drawableHeight = height
+        drawableRef.set(null)
+    }
+
+    /** 设置图片外间距 */
+    fun setMarginHorizontal(left: Int, right: Int = left) = apply {
+        this.marginLeft = left
+        this.marginRight = right
         drawableRef.set(null)
     }
 

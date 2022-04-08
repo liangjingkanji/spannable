@@ -7,7 +7,6 @@ import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.text.style.ImageSpan
-import com.drake.spannable.span.GlideImageSpan.Align
 import java.lang.ref.WeakReference
 
 /**
@@ -27,6 +26,14 @@ class CenterImageSpan : ImageSpan {
 
     /** 图片高度 */
     var drawableHeight: Int = 0
+        private set
+
+    /** 图片左间距 */
+    var marginLeft: Int = 0
+        private set
+
+    /** 图片右间距 */
+    var marginRight: Int = 0
         private set
 
     private var drawableRef: WeakReference<Drawable>? = null
@@ -81,7 +88,7 @@ class CenterImageSpan : ImageSpan {
             fm.top = fm.ascent
             fm.bottom = fm.descent
         }
-        return bounds.right
+        return bounds.right + marginLeft + marginRight
     }
 
     override fun draw(
@@ -103,7 +110,7 @@ class CenterImageSpan : ImageSpan {
         } else if (align == Align.CENTER) {
             transY = (bottom - top) / 2 - drawable.bounds.height() / 2
         }
-        canvas.translate(x, transY.toFloat())
+        canvas.translate(x + marginLeft, transY.toFloat())
         drawable.draw(canvas)
         canvas.restore()
     }
@@ -132,6 +139,13 @@ class CenterImageSpan : ImageSpan {
     fun setDrawableSize(width: Int, height: Int = width) = apply {
         this.drawableWidth = width
         this.drawableHeight = height
+        drawableRef?.clear()
+    }
+
+    /** 设置图片外间距 */
+    fun setMarginHorizontal(left: Int, right: Int = left) = apply {
+        this.marginLeft = left
+        this.marginRight = right
         drawableRef?.clear()
     }
 
