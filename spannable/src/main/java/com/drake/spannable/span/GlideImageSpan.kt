@@ -2,6 +2,7 @@ package com.drake.spannable.span
 
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.text.style.ReplacementSpan
 import android.widget.TextView
@@ -51,29 +52,28 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
         end: Int,
         fm: Paint.FontMetricsInt?
     ): Int {
-        val bounds = getDrawable()?.bounds
+        val bounds = getDrawable()?.bounds ?: Rect(0, 0, drawableWidth, drawableHeight)
         if (fm != null) {
             val fontMetricsInt = paint.fontMetricsInt
             val fontHeight = fontMetricsInt.descent - fontMetricsInt.ascent
-            val imageHeight = drawableHeight.takeIf { it > 0 } ?: bounds?.height() ?: 0
             when (align) {
                 Align.CENTER -> {
-                    fm.ascent = fontMetricsInt.ascent - ((imageHeight - fontHeight) / 2.0f).toInt()
-                    fm.descent = fm.ascent + imageHeight
+                    fm.ascent = fontMetricsInt.ascent - ((bounds.height() - fontHeight) / 2.0f).toInt()
+                    fm.descent = fm.ascent + bounds.height()
                 }
                 Align.BASELINE -> {
-                    fm.ascent = fontMetricsInt.ascent - (imageHeight - fontHeight + (fontMetricsInt.descent / 2))
+                    fm.ascent = -bounds.bottom
                     fm.descent = 0
                 }
                 Align.BOTTOM -> {
-                    fm.ascent = fontMetricsInt.ascent - (imageHeight - fontHeight)
+                    fm.ascent = -bounds.bottom + fm.descent
                     fm.descent = 0
                 }
             }
             fm.top = fm.ascent
             fm.bottom = fm.descent
         }
-        return bounds?.right ?: 0 + marginLeft + marginRight
+        return bounds.right + marginLeft + marginRight
     }
 
     override fun draw(
@@ -89,12 +89,12 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
     ) {
         getDrawable()?.let { drawable ->
             canvas.save()
-            var transY = bottom - drawable.bounds.bottom
-            val fontMetricsInt = paint.fontMetricsInt
+            val bounds = drawable.bounds
+            var transY = bottom - bounds.bottom
             if (align == Align.BASELINE) {
-                transY -= fontMetricsInt.descent
+                transY -= paint.fontMetricsInt.descent
             } else if (align == Align.CENTER) {
-                transY = (bottom - top) / 2 - drawable.bounds.height() / 2
+                transY -= (bottom - top) / 2 - (bounds.bottom - bounds.top) / 2
             }
             canvas.translate(x + marginLeft, transY.toFloat())
             drawable.draw(canvas)

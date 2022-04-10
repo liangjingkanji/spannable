@@ -77,11 +77,11 @@ class CenterImageSpan : ImageSpan {
                     fm.descent = fm.ascent + imageHeight
                 }
                 Align.BASELINE -> {
-                    fm.ascent = fontMetricsInt.ascent - (imageHeight - fontHeight + (fontMetricsInt.descent / 2))
+                    fm.ascent = -bounds.bottom
                     fm.descent = 0
                 }
                 Align.BOTTOM -> {
-                    fm.ascent = fontMetricsInt.ascent - (imageHeight - fontHeight)
+                    fm.ascent = -bounds.bottom + fm.descent
                     fm.descent = 0
                 }
             }
@@ -103,12 +103,12 @@ class CenterImageSpan : ImageSpan {
         paint: Paint
     ) {
         canvas.save()
-        var transY = bottom - drawable.bounds.bottom
-        val fontMetricsInt = paint.fontMetricsInt
+        val bounds = drawable.bounds
+        var transY = bottom - bounds.bottom
         if (align == Align.BASELINE) {
-            transY -= fontMetricsInt.descent
+            transY -= paint.fontMetricsInt.descent
         } else if (align == Align.CENTER) {
-            transY = (bottom - top) / 2 - drawable.bounds.height() / 2
+            transY -= (bottom - top) / 2 - (bounds.bottom - bounds.top) / 2
         }
         canvas.translate(x + marginLeft, transY.toFloat())
         drawable.draw(canvas)
