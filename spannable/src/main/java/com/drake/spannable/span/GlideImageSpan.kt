@@ -121,7 +121,7 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
                 }
 
                 override fun onLoadFailed(errorDrawable: Drawable?) {
-                    if (errorDrawable != getDrawable()) {
+                    if (errorDrawable != drawableRef.get()) {
                         setDrawable(errorDrawable)
                         errorDrawable?.let { view.invalidate() }
                     }
