@@ -10,11 +10,13 @@ import android.text.style.ImageSpan
 import java.lang.ref.WeakReference
 
 /**
- * 图片完全垂直居中对齐文字(ImageSpan无法真正垂直居中)
- * 垂直居中文字不要求Api23以上
- * 设置图片宽高且保持固定比例
+ * 比官方[ImageSpan]更好用的图片显示Span
  *
- * 图片默认垂直居中对齐文字
+ * 设置图片垂直对齐方式
+ * 设置图片宽高且保持固定比例
+ * 设置图片水平间距
+ *
+ * 默认图片垂直居中对齐文字, 使用[setAlign]可指定
  *
  * 需应对更复杂的图片加载需求请使用[GlideImageSpan]
  */
@@ -40,17 +42,22 @@ class CenterImageSpan : ImageSpan {
 
     override fun getDrawable(): Drawable {
         return drawableRef?.get() ?: super.getDrawable().apply {
-            val ratio = intrinsicWidth.toDouble() / intrinsicHeight.toDouble()
-            drawableWidth = if (drawableWidth > 0) drawableWidth else intrinsicWidth
-            drawableHeight = if (drawableHeight > 0) drawableHeight else intrinsicHeight
-            if (drawableWidth > drawableHeight) {
-                drawableWidth = (drawableHeight * ratio).toInt()
-            } else if (drawableWidth < drawableHeight) {
-                drawableHeight = (drawableWidth / ratio).toInt()
-            }
-            setBounds(0, 0, drawableWidth, drawableHeight)
+            setFixedRatioZoom()
             drawableRef = WeakReference(this)
         }
+    }
+
+    /** 设置等比例缩放图片, 这会导致[drawableWidth]和[drawableHeight]根据图片原始比例变化 */
+    private fun Drawable.setFixedRatioZoom() {
+        val ratio = intrinsicWidth.toDouble() / intrinsicHeight
+        drawableWidth = if (drawableWidth > 0) drawableWidth else intrinsicWidth
+        drawableHeight = if (drawableHeight > 0) drawableHeight else intrinsicHeight
+        if (intrinsicWidth > intrinsicHeight) {
+            drawableHeight = (drawableWidth / ratio).toInt()
+        } else if (intrinsicHeight > intrinsicWidth) {
+            drawableWidth = (drawableHeight / ratio).toInt()
+        }
+        setBounds(0, 0, drawableWidth, drawableHeight)
     }
 
     constructor(drawable: Drawable) : super(drawable)
@@ -134,7 +141,7 @@ class CenterImageSpan : ImageSpan {
 
     /**
      * 设置图片宽高
-     * 如果参数值为0则表示使用图片原始宽高
+     * 如果参数值为0则表示使用图片原始宽高, 无论宽高值如何图片都将会按照固定比例缩放, 你无需但需错误值导致图片拉伸变形
      */
     fun setDrawableSize(width: Int, height: Int = width) = apply {
         this.drawableWidth = width
@@ -142,7 +149,7 @@ class CenterImageSpan : ImageSpan {
         drawableRef?.clear()
     }
 
-    /** 设置图片外间距 */
+    /** 设置图片水平间距 */
     fun setMarginHorizontal(left: Int, right: Int = left) = apply {
         this.marginLeft = left
         this.marginRight = right

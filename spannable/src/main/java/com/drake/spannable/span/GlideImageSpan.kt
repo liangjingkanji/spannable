@@ -13,13 +13,13 @@ import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
 import java.util.concurrent.atomic.AtomicReference
 
 /**
- * ** 使用本类请先依赖Glide库 **
- * 使用Glide加载图片资源
- * 图片完全垂直居中对齐文字(ImageSpan无法真正垂直居中)
- * 垂直居中文字不要求Api23以上
- * 设置图片宽高且保持固定比例
+ * 使用Glide加载图片资源, 请先依赖[Glide](https://github.com/bumptech/glide)
  *
- * 图片默认垂直居中对齐文字
+ * 设置图片垂直对齐方式
+ * 设置图片宽高且保持固定比例, 如果存在占位图会优先使用占位图宽高比
+ * 设置图片水平间距
+ *
+ * 默认图片垂直居中对齐文字, 使用[setAlign]可指定
  *
  * @see CenterImageSpan 如果你不需要加载网络图片可以使用该类
  */
@@ -104,9 +104,16 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
 
     fun getDrawable(): Drawable? {
         if (drawableRef.get() == null) {
+            val placeHolder = try {
+                requestOption.placeholderDrawable ?: view.context.resources.getDrawable(requestOption.placeholderId)
+            } catch (e: Exception) {
+                null
+            }
+            placeHolder?.setFixedRatioZoom()
             val width = if (drawableWidth > 0) drawableWidth else SIZE_ORIGINAL
             val height = if (drawableHeight > 0) drawableHeight else SIZE_ORIGINAL
-            Glide.with(view.context).load(url).apply(requestOption).into(object : SimpleTarget<Drawable>(width, height) {
+
+            Glide.with(view.context).load(url).fitCenter().apply(requestOption).into(object : SimpleTarget<Drawable>(width, height) {
                 override fun onResourceReady(
                     resource: Drawable,
                     transition: com.bumptech.glide.request.transition.Transition<in Drawable>?
@@ -117,13 +124,17 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
                 }
 
                 override fun onLoadStarted(placeholder: Drawable?) {
-                    setDrawable(placeholder)
+                    if (placeholder != null) {
+                        placeholder.setFixedRatioZoom()
+                        drawableRef.set(placeholder)
+                    }
                 }
 
                 override fun onLoadFailed(errorDrawable: Drawable?) {
-                    if (errorDrawable != drawableRef.get()) {
-                        setDrawable(errorDrawable)
-                        errorDrawable?.let { view.invalidate() }
+                    if (errorDrawable != null && errorDrawable != drawableRef.get()) {
+                        errorDrawable.setFixedRatioZoom()
+                        drawableRef.set(errorDrawable)
+                        view.invalidate()
                     }
                 }
             })
@@ -131,23 +142,25 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
         return drawableRef.get()
     }
 
-    private fun setDrawable(resource: Drawable?) {
-        resource ?: return
-        val ratio = resource.intrinsicWidth.toDouble() / resource.intrinsicHeight.toDouble()
-        drawableWidth = if (drawableWidth > 0) drawableWidth else resource.intrinsicWidth
-        drawableHeight = if (drawableHeight > 0) drawableHeight else resource.intrinsicHeight
-        if (drawableWidth > drawableHeight) {
-            drawableWidth = (drawableHeight * ratio).toInt()
-        } else if (drawableWidth < drawableHeight) {
+    /** 设置等比例缩放图片, 这会导致[drawableWidth]和[drawableHeight]根据图片原始比例变化 */
+    private fun Drawable.setFixedRatioZoom() {
+        val ratio = intrinsicWidth.toDouble() / intrinsicHeight
+        drawableWidth = if (drawableWidth > 0) drawableWidth else intrinsicWidth
+        drawableHeight = if (drawableHeight > 0) drawableHeight else intrinsicHeight
+        if (intrinsicWidth > intrinsicHeight) {
             drawableHeight = (drawableWidth / ratio).toInt()
+        } else if (intrinsicWidth < intrinsicHeight) {
+            drawableWidth = (drawableHeight / ratio).toInt()
         }
-        resource.setBounds(0, 0, drawableWidth, drawableHeight)
-        drawableRef.set(resource)
+        setBounds(0, 0, drawableWidth, drawableHeight)
     }
+
 
     /**
      * 配置Glide请求选项, 例如占位图、加载失败图等
-     * 默认启用裁剪centerCrop
+     * 如果使用[RequestOptions.placeholder]占位图会导致默认使用占位图宽高, 除非你使用[setDrawableSize]覆盖默认值
+     *
+     * 默认会使用[RequestOptions.fitCenterTransform]保持图片纵横比例不变, 当然你可以覆盖该配置
      */
     fun setRequestOption(requestOption: RequestOptions) = apply {
         this.requestOption = requestOption
@@ -171,7 +184,7 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
 
     /**
      * 设置图片宽高
-     * 如果参数值为0则表示使用图片原始宽高
+     * 如果参数值为0则表示使用图片原始宽高, 无论宽高值如何图片都将会按照固定比例缩放, 你无需但需错误值导致图片拉伸变形
      */
     fun setDrawableSize(width: Int, height: Int = width) = apply {
         this.drawableWidth = width
@@ -179,7 +192,7 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
         drawableRef.set(null)
     }
 
-    /** 设置图片外间距 */
+    /** 设置图片水平间距 */
     fun setMarginHorizontal(left: Int, right: Int = left) = apply {
         this.marginLeft = left
         this.marginRight = right
