@@ -7,23 +7,29 @@ import android.graphics.drawable.Drawable
 import android.text.style.ReplacementSpan
 import android.widget.TextView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
+import com.bumptech.glide.request.transition.Transition
 import java.util.concurrent.atomic.AtomicReference
 
 /**
  * 使用Glide加载图片资源, 请先依赖[Glide](https://github.com/bumptech/glide)
  *
- * 设置图片垂直对齐方式
- * 设置图片宽高且保持固定比例, 如果存在占位图会优先使用占位图宽高比
- * 设置图片水平间距
+ * 图片垂直对齐方式
+ * 图片宽高且保持固定比例, 如果存在占位图会优先使用占位图宽高比
+ * 图片水平间距
+ * 播放GIF动画
  *
  * 默认图片垂直居中对齐文字, 使用[setAlign]可指定
  *
  * @see CenterImageSpan 如果你不需要加载网络图片可以使用该类
  */
 class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
+
+    /** gif循环次数 */
+    private var loopCount: Int = GifDrawable.LOOP_FOREVER
 
     /** 图片宽度 */
     var drawableWidth: Int = 0
@@ -102,6 +108,23 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
         }
     }
 
+    /** GIF动画触发刷新文字的回调 */
+    private val drawableCallback = object : Drawable.Callback {
+        override fun invalidateDrawable(who: Drawable) {
+            view.invalidate()
+        }
+
+        override fun scheduleDrawable(
+            who: Drawable,
+            what: Runnable,
+            `when`: Long
+        ) {
+        }
+
+        override fun unscheduleDrawable(who: Drawable, what: Runnable) {
+        }
+    }
+
     fun getDrawable(): Drawable? {
         if (drawableRef.get() == null) {
             val placeHolder = try {
@@ -113,11 +136,16 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
             val width = if (drawableWidth > 0) drawableWidth else SIZE_ORIGINAL
             val height = if (drawableHeight > 0) drawableHeight else SIZE_ORIGINAL
 
-            Glide.with(view.context).load(url).fitCenter().apply(requestOption).into(object : SimpleTarget<Drawable>(width, height) {
+            Glide.with(view.context).load(url).fitCenter().apply(requestOption).into(object : CustomTarget<Drawable>(width, height) {
                 override fun onResourceReady(
                     resource: Drawable,
-                    transition: com.bumptech.glide.request.transition.Transition<in Drawable>?
+                    transition: Transition<in Drawable>?
                 ) {
+                    if (resource is GifDrawable) {
+                        resource.callback = drawableCallback
+                        resource.setLoopCount(loopCount)
+                        resource.start()
+                    }
                     resource.setBounds(0, 0, resource.intrinsicWidth, resource.intrinsicHeight)
                     drawableRef.set(resource)
                     view.invalidate()
@@ -136,6 +164,9 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
                         drawableRef.set(errorDrawable)
                         view.invalidate()
                     }
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {
                 }
             })
         }
@@ -197,6 +228,11 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
         this.marginLeft = left
         this.marginRight = right
         drawableRef.set(null)
+    }
+
+    /** GIF动画播放循环次数, 默认无限循环 */
+    fun setLoopCount(loopCount: Int) = apply {
+        this.loopCount = loopCount
     }
 
 }

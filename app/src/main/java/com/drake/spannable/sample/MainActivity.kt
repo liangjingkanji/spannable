@@ -95,7 +95,15 @@ class MainActivity : AppCompatActivity() {
                 GlideImageSpan(binding.tv6, "https://s1.hdslb.com/bfs/static/blive/blfe-dynamic-web/static/img/no-login.9be609c5.png")
                     .setAlign(GlideImageSpan.Align.BOTTOM)
                     .setDrawableSize(50.dp)
-            ) // 设置一个80像素宽高的图标
+            )
+
+        // gif图文混排
+        binding.tv7.text = "播放GIF动画".addSpan(
+            "image",
+            GlideImageSpan(binding.tv7, "https://i0.wp.com/www.printmag.com/wp-content/uploads/2021/02/4cbe8d_f1ed2800a49649848102c68fc5a66e53mv2.gif?fit=476%2C280&ssl=1")
+                .setDrawableSize(80.dp)
+                .setMarginHorizontal(4.dp)
+        ).addSpan("也是非常简单")
     }
 }
 
