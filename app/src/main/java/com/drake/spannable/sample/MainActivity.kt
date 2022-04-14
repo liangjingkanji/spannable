@@ -97,13 +97,11 @@ class MainActivity : AppCompatActivity() {
                     .setDrawableSize(50.dp)
             )
 
-        // gif图文混排
+        // GIF图文混排
         binding.tv7.text = "播放GIF动画".addSpan(
             "image",
-            GlideImageSpan(binding.tv7, "https://i0.wp.com/www.printmag.com/wp-content/uploads/2021/02/4cbe8d_f1ed2800a49649848102c68fc5a66e53mv2.gif?fit=476%2C280&ssl=1")
-                .setDrawableSize(80.dp)
-                .setMarginHorizontal(4.dp)
-        ).addSpan("也是非常简单")
+            GlideImageSpan(binding.tv7, R.drawable.ic_gif).setDrawableSize(50.dp)
+        ).addSpan("没有区别")
     }
 }
 
