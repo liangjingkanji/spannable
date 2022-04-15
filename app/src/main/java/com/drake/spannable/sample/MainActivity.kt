@@ -98,10 +98,9 @@ class MainActivity : AppCompatActivity() {
             )
 
         // GIF图文混排
-        binding.tv7.text = "播放GIF动画".addSpan(
-            "image",
+        binding.tv7.text = "播放GIF动画[晕]表情".replaceSpan("[晕]") {
             GlideImageSpan(binding.tv7, R.drawable.ic_gif).setDrawableSize(50.dp)
-        ).addSpan("没有区别")
+        }
     }
 }
 
