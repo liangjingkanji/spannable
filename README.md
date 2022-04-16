@@ -1,5 +1,7 @@
+<p align="center"> <strong>Spannable和创建字符串一样简单</strong> </p>
+
+<br>
 <p align="center"> <img align="center" src="https://user-images.githubusercontent.com/21078112/162008072-a3ec82c7-1154-41c7-8a33-3159bd786872.png" width="350"/></p>
-<p align="center"> <strong>创建SpannableString和创建字符串一样简单</strong> </p>
 
 <p align="center">
 <a href="https://jitpack.io/#liangjingkanji/spannable"><img src="https://jitpack.io/v/liangjingkanji/spannable.svg"/></a>
@@ -10,14 +12,9 @@
 
 
 <br>
-
 <p align="center">
-<img src="https://s2.loli.net/2021/12/28/1EQMqYTvwL8Du3G.jpg" width="650"/>
+<img src="https://user-images.githubusercontent.com/21078112/163671712-0a8644b3-8875-489e-a1e5-f8f3215ff4fc.png" width="550"/>
 </p>
-
-<br>
-
-<p align="center"><strong>欢迎贡献代码/问题</strong></p>
 
 <br>
 
@@ -26,9 +23,10 @@
 ## 特点
 
 - 低学习成本
-- 首个支持替换/正则匹配Span的库
+- 首个支持替换/正则/捕获组Span的库
 - 全部使用CharSequence接口, 使用起来和字符串没有区别
-- 良好扩展性, 没有自定义控件/没有多余函数
+- 没有自定义控件/没有多余函数
+- 快速实现图文混排/富文本/自定义表情包
 
 
 ## 函数
@@ -43,7 +41,7 @@
 | replaceSpanFirst/replaceSpanLast | 替换/正则替换第一个/最后一个匹配项的Span或字符串 |
 
 ## Span
-本框架会收集一些常用的Span效果实现
+本框架会收集一些常用的Span效果实现, **欢迎贡献代码**
 
 | Span | 描述 |
 |-|-|
