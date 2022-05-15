@@ -54,8 +54,8 @@ class CenterImageSpan : ImageSpan {
         drawableHeight = if (drawableHeight > 0) drawableHeight else intrinsicHeight
         if (intrinsicWidth > intrinsicHeight) {
             drawableHeight = (drawableWidth / ratio).toInt()
-        } else if (intrinsicHeight > intrinsicWidth) {
-            drawableWidth = (drawableHeight / ratio).toInt()
+        } else if (intrinsicWidth < intrinsicHeight) {
+            drawableWidth = (drawableHeight * ratio).toInt()
         }
         setBounds(0, 0, drawableWidth, drawableHeight)
     }

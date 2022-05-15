@@ -181,7 +181,7 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
         if (intrinsicWidth > intrinsicHeight) {
             drawableHeight = (drawableWidth / ratio).toInt()
         } else if (intrinsicWidth < intrinsicHeight) {
-            drawableWidth = (drawableHeight / ratio).toInt()
+            drawableWidth = (drawableHeight * ratio).toInt()
         }
         setBounds(0, 0, drawableWidth, drawableHeight)
     }
