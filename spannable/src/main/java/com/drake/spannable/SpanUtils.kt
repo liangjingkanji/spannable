@@ -76,7 +76,7 @@ fun CharSequence.setSpan(what: Any?, start: Int, end: Int, flags: Int = Spanned.
 
 /**
  * 添加字符串并添加效果, 同时保留以前文字效果
- * @param text 可以是[android.text.Spanned]或[CharSequence]
+ * @param text 可以是[android.text.Spanned]或[CharSequence], 空字符则添加无效
  * @param what 文字效果, 如果为数组或者集合则设置多个
  * @param flags 参考 [Spanned.SPAN_EXCLUSIVE_EXCLUSIVE]
  *
@@ -103,7 +103,7 @@ fun CharSequence.addSpan(text: CharSequence, what: Any? = null, flags: Int = Spa
 /**
  * 添加字符串到指定位置并添加效果, 同时保留以前文字效果
  * @param where 插入位置
- * @param text 可以是[android.text.Spanned]或[CharSequence]
+ * @param text 可以是[android.text.Spanned]或[CharSequence], 空字符则添加无效
  * @param what 文字效果, 如果为数组或者集合则设置多个
  * @param flags 参考 [Spanned.SPAN_EXCLUSIVE_EXCLUSIVE]
  *
