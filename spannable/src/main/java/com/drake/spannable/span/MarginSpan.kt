@@ -7,7 +7,7 @@ import android.graphics.Paint.FontMetricsInt
 import android.text.style.ReplacementSpan
 import androidx.annotation.IntRange
 
-class MarginSpan(
+class MarginSpan @JvmOverloads constructor(
     private val width: Int,
     color: Int = Color.TRANSPARENT
 ) : ReplacementSpan() {

@@ -32,7 +32,7 @@ import androidx.core.content.ContextCompat
  * @param typeface 字体样式
  * @param onClick 点击事件
  */
-class HighlightSpan(
+class HighlightSpan @JvmOverloads constructor(
     @ColorInt val color: Int? = null,
     val typeface: Typeface? = null,
     val onClick: ((View) -> Unit)? = null
@@ -44,8 +44,9 @@ class HighlightSpan(
      * @param typeface 字体样式
      * @param onClick 点击事件
      */
+    @JvmOverloads
     constructor(
-        color: String? = null,
+        color: String,
         typeface: Typeface? = null,
         onClick: ((View) -> Unit)? = null
     ) : this(Color.parseColor(color), typeface, onClick)
@@ -56,6 +57,7 @@ class HighlightSpan(
      * @param typeface 字体样式
      * @param onClick 点击事件
      */
+    @JvmOverloads
     constructor(
         context: Context,
         @ColorRes colorRes: Int,

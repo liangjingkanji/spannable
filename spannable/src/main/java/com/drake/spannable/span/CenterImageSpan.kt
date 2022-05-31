@@ -143,6 +143,7 @@ class CenterImageSpan : ImageSpan {
      * 设置图片宽高
      * 如果参数值为0则表示使用图片原始宽高, 无论宽高值如何图片都将会按照固定比例缩放, 你无需但需错误值导致图片拉伸变形
      */
+    @JvmOverloads
     fun setDrawableSize(width: Int, height: Int = width) = apply {
         this.drawableWidth = width
         this.drawableHeight = height
@@ -150,6 +151,7 @@ class CenterImageSpan : ImageSpan {
     }
 
     /** 设置图片水平间距 */
+    @JvmOverloads
     fun setMarginHorizontal(left: Int, right: Int = left) = apply {
         this.marginLeft = left
         this.marginRight = right
