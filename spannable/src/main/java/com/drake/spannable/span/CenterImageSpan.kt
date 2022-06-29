@@ -1,12 +1,13 @@
 package com.drake.spannable.span
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
+import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.text.TextPaint
 import android.text.style.ImageSpan
+import android.view.Gravity
+import androidx.annotation.ColorInt
 import java.lang.ref.WeakReference
 
 /**
@@ -15,6 +16,7 @@ import java.lang.ref.WeakReference
  * 图片垂直对齐方式
  * 图片宽高且保持固定比例
  * 图片水平间距
+ * 图片显示文字
  *
  * 默认图片垂直居中对齐文字, 使用[setAlign]可指定
  *
@@ -68,7 +70,7 @@ class CenterImageSpan : ImageSpan {
 
     override fun getSize(
         paint: Paint,
-        text: CharSequence?,
+        text: CharSequence,
         start: Int,
         end: Int,
         fm: Paint.FontMetricsInt?
@@ -100,7 +102,7 @@ class CenterImageSpan : ImageSpan {
 
     override fun draw(
         canvas: Canvas,
-        text: CharSequence?,
+        text: CharSequence,
         start: Int,
         end: Int,
         x: Float,
@@ -119,6 +121,30 @@ class CenterImageSpan : ImageSpan {
         }
         canvas.translate(x + marginLeft, transY.toFloat())
         drawable.draw(canvas)
+
+        // 绘制文字
+        if (textVisibility) {
+            textSize?.let { paint.textSize = it.toFloat() }
+            textColor?.let { paint.color = it }
+            typeface?.let { paint.typeface = it }
+            (paint as? TextPaint)?.let { paintConfig?.invoke(it) }
+            val textWidth = paint.measureText(text, start, end)
+            val textDrawRect = Rect()
+            val textContainerRect = Rect(bounds)
+            Gravity.apply(
+                textGravity,
+                textWidth.toInt(),
+                paint.textSize.toInt(),
+                textContainerRect,
+                textDrawRect
+            )
+            canvas.drawText(
+                text, start, end,
+                (textDrawRect.left + textOffsetRect.left - textOffsetRect.right).toFloat(),
+                (textDrawRect.bottom - (paint.fontMetricsInt.descent / 2) + textOffsetRect.top - textOffsetRect.bottom).toFloat(),
+                paint
+            )
+        }
         canvas.restore()
     }
 
@@ -157,5 +183,62 @@ class CenterImageSpan : ImageSpan {
         this.marginRight = right
         drawableRef?.clear()
     }
+
+    //<editor-fold desc="Text">
+    private var textOffsetRect = Rect()
+    private var textGravity = Gravity.CENTER
+    private var textVisibility = false
+    private var textSize: Int? = null
+    private var textColor: Int? = null
+    private var typeface: Typeface? = null
+    private var paintConfig: (TextPaint.() -> Unit)? = null
+
+    /**
+     * 当前为背景图片, 这会导致显示文字内容, 但图片不会根据文字内容自动调整
+     * @param visibility 是否显示文字
+     */
+    @JvmOverloads
+    fun setTextVisibility(visibility: Boolean = true) = apply {
+        this.textVisibility = visibility
+    }
+
+    /** 文字偏移值 */
+    @JvmOverloads
+    fun setTextOffset(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0) = apply {
+        textOffsetRect.set(left, top, right, bottom)
+    }
+
+    /**
+     * 文字对齐方式(基于图片), 默认对齐方式[Gravity.CENTER]
+     * @param gravity 值等效于[android.widget.TextView.setGravity], 例如[Gravity.BOTTOM], 使用[or]组合多个值
+     */
+    fun setTextGravity(gravity: Int) = apply {
+        this.textGravity = gravity
+    }
+
+    /** 配置文字画笔, 可以配置颜色/粗体/斜体等效果 */
+    fun setTextPaint(paint: TextPaint.() -> Unit) = apply {
+        paintConfig = paint
+    }
+
+    /**
+     * 设置文字样式, 例如[android.graphics.Typeface.BOLD]粗体
+     */
+    fun setTypeface(typeface: Typeface) = apply {
+        this.typeface = typeface
+    }
+
+    fun setTextSize(size: Int) = apply {
+        textSize = size
+    }
+
+    fun setTextColor(color: String) = apply {
+        textColor = Color.parseColor(color)
+    }
+
+    fun setTextColor(@ColorInt color: Int) = apply {
+        textColor = color
+    }
+    //</editor-fold>
 
 }
