@@ -46,8 +46,8 @@
 
 | Span | 描述 |
 |-|-|
-| CenterImageSpan | 垂直对齐方式/图片宽高/固定图片比例 |
-| GlideImageSpan | 网络图片/GIF动画/垂直对齐方式/图片宽高/固定图片比例, 要求依赖[Glide](https://github.com/bumptech/glide) |
+| CenterImageSpan | 垂直对齐方式/图片宽高/固定图片比例/显示文字 |
+| GlideImageSpan | 网络图片/GIF动画/垂直对齐方式/图片宽高/固定图片比例/显示文字, 要求依赖[Glide](https://github.com/bumptech/glide) |
 | MarginSpan | 文字间距 |
 | ColorSpan | 快速创建文字颜色 |
 | HighlightSpan | 创建字体颜色/字体样式/可点击效果 |
@@ -86,7 +86,7 @@ dependencyResolutionManagement {
 然后在 module 的 build.gradle 添加依赖框架
 
 ```groovy
-implementation 'com.github.liangjingkanji:spannable:1.1.4'
+implementation 'com.github.liangjingkanji:spannable:1.1.5'
 ```
 
 
