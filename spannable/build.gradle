@@ -17,16 +17,12 @@
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
-apply plugin: "com.github.dcendents.android-maven"
-group = "com.gitlab.liangjingkanji"
-
-
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -39,28 +35,11 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
-
-    dataBinding {
-        enabled = true
-    }
-
-    dexOptions {
-        preDexLibraries true
-        maxProcessCount 8
-        javaMaxHeapSize "4g"
-    }
-
-    compileOptions {
-        sourceCompatibility = 1.8
-        targetCompatibility = 1.8
-    }
 }
 
 
 dependencies {
     implementation fileTree(include: ["*.jar"], dir: "libs")
-    testImplementation "junit:junit:4.13.2"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "androidx.core:core-ktx:1.6.0"
 
     compileOnly "com.github.bumptech.glide:glide:4.11.0"
