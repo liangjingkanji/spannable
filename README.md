@@ -1,7 +1,10 @@
 <p align="center"> <strong>Spannable和创建字符串一样简单</strong> </p>
 
 <br>
-<p align="center"> <img align="center" src="https://user-images.githubusercontent.com/21078112/162008072-a3ec82c7-1154-41c7-8a33-3159bd786872.png" width="350"/></p>
+<p align="center">
+<img src="https://user-images.githubusercontent.com/21078112/162008072-a3ec82c7-1154-41c7-8a33-3159bd786872.png" width="350"/>
+<img src="https://user-images.githubusercontent.com/21078112/184396518-4022db12-0fa9-48a0-97c1-22960db9362b.png" width="350"/>
+</p>
 
 <p align="center">
 <a href="https://jitpack.io/#liangjingkanji/spannable"><img src="https://jitpack.io/v/liangjingkanji/spannable.svg"/></a>
@@ -10,6 +13,9 @@
 <a href="https://jq.qq.com/?_wv=1027&k=vWsXSNBJ"><img src="https://img.shields.io/badge/QQ群-752854893-blue"/></a>
 </p>
 
+<p align="center">
+<a href="https://github.com/liangjingkanji/spannable/releases/download/1.1.6/spannale-sample.apk">下载体验</a>
+</p>
 
 <br>
 <p align="center">
@@ -17,10 +23,7 @@
 </p>
 <br>
 
-很多人觉得Spannable在开发中中并不常用, 我认为那只是因为没有字符串那么易用导致!
-
-除了富文本场景下还可以做到取代动态View的添加删除, 减少嵌套列表, 并且Model中构建图文CharSequence更便于MVVM架构中的视图/数据解耦
-
+本工具真正实现让Spannable和String一样易用, 快速实现常见的图文列表/图文混排/表情包需求/文字换行, 同时也是全网第一个实现正则替换和最完美实现图文混排的Span工具, 对于MVVM架构更是如虎添翼, 数据和视图解耦
 
 ## 特点
 
@@ -29,6 +32,7 @@
 - [x] 全部使用CharSequence接口, 使用起来和字符串没有区别
 - [x] 没有自定义控件/没有多余函数
 - [x] 快速实现图文混排/富文本/自定义表情包
+- [x] 输入框富文本/表情包
 
 ## 函数
 
@@ -86,7 +90,7 @@ dependencyResolutionManagement {
 然后在 module 的 build.gradle 添加依赖框架
 
 ```groovy
-implementation 'com.github.liangjingkanji:spannable:1.1.5'
+implementation 'com.github.liangjingkanji:spannable:1.1.6'
 ```
 
 

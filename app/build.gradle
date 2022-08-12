@@ -42,6 +42,12 @@ android {
         targetCompatibility = 1.8
     }
 
+    applicationVariants.all {
+        it.outputs.each { output ->
+            output.outputFileName = "spannale-sample.apk"
+        }
+    }
+
 }
 
 dependencies {
