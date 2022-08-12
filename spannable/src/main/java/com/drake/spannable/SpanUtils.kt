@@ -27,7 +27,7 @@ import androidx.core.text.set
  * @param what 文字效果, 如果为数组或者集合则设置多个
  * @param flags 参考 [Spanned.SPAN_EXCLUSIVE_EXCLUSIVE]
  *
- * @return 如果接受者不为[Spannable]则将返回一个新的对象
+ * @return 如果[this]不为[Spannable]则将返回一个新的对象
  */
 @JvmOverloads
 fun CharSequence.setSpan(what: Any?, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE): CharSequence {
@@ -54,10 +54,15 @@ fun CharSequence.setSpan(what: Any?, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSI
  * @param end 结束索引
  * @param flags 参考 [Spanned.SPAN_EXCLUSIVE_EXCLUSIVE]
  *
- * @return 如果接受者不为[Spannable]则将返回一个新的对象
+ * @return 如果[this]不为[Spannable]则将返回一个新的对象
  */
 @JvmOverloads
-fun CharSequence.setSpan(what: Any?, start: Int, end: Int, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE): CharSequence {
+fun CharSequence.setSpan(
+    what: Any?,
+    start: Int,
+    end: Int,
+    flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+): CharSequence {
     val str = when (this) {
         is Spannable -> this
         else -> SpannableString(this)
@@ -80,10 +85,14 @@ fun CharSequence.setSpan(what: Any?, start: Int, end: Int, flags: Int = Spanned.
  * @param what 文字效果, 如果为数组或者集合则设置多个
  * @param flags 参考 [Spanned.SPAN_EXCLUSIVE_EXCLUSIVE]
  *
- * @return 如果接受者不为[SpannableStringBuilder]则将返回一个新的对象
+ * @return 如果接受者不为[SpannableStringBuilder]则将返回一个新的[SpannableStringBuilder]对象
  */
 @JvmOverloads
-fun CharSequence.addSpan(text: CharSequence, what: Any? = null, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE): CharSequence {
+fun CharSequence.addSpan(
+    text: CharSequence,
+    what: Any? = null,
+    flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+): CharSequence {
     val spannable = when (what) {
         is Array<*> -> what.fold(text) { s, span ->
             s.setSpan(span, flags)
@@ -93,11 +102,10 @@ fun CharSequence.addSpan(text: CharSequence, what: Any? = null, flags: Int = Spa
         }
         else -> text.setSpan(what, flags)
     }
-    val spannableStringBuilder = when (this) {
+    return when (this) {
         is SpannableStringBuilder -> append(spannable)
         else -> SpannableStringBuilder(this).append(spannable)
     }
-    return spannableStringBuilder
 }
 
 /**
@@ -107,10 +115,15 @@ fun CharSequence.addSpan(text: CharSequence, what: Any? = null, flags: Int = Spa
  * @param what 文字效果, 如果为数组或者集合则设置多个
  * @param flags 参考 [Spanned.SPAN_EXCLUSIVE_EXCLUSIVE]
  *
- * @return 如果接受者不为[SpannableStringBuilder]则将返回一个新的对象
+ * @return 如果接受者不为[SpannableStringBuilder]则将返回一个新的[SpannableStringBuilder]对象
  */
 @JvmOverloads
-fun CharSequence.addSpan(where: Int, text: CharSequence, what: Any? = null, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE): CharSequence {
+fun CharSequence.addSpan(
+    where: Int,
+    text: CharSequence,
+    what: Any? = null,
+    flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+): CharSequence {
     val spannable = when (what) {
         is Array<*> -> what.fold(text) { s, span ->
             s.setSpan(span, flags)
@@ -120,11 +133,10 @@ fun CharSequence.addSpan(where: Int, text: CharSequence, what: Any? = null, flag
         }
         else -> text.setSpan(what, flags)
     }
-    val spannableStringBuilder = when (this) {
+    return when (this) {
         is SpannableStringBuilder -> insert(where, spannable)
         else -> SpannableStringBuilder(this).insert(where, spannable)
     }
-    return spannableStringBuilder
 }
 
 /**
@@ -140,10 +152,17 @@ fun CharSequence.addSpan(where: Int, text: CharSequence, what: Any? = null, flag
  * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
  * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
  *
- * @return 如果没有匹配任何项会返回原来的[CharSequence]
+ * @return
+ * 1. 没有匹配任何项返回[this]
+ * 2. 匹配Span效果且[this]类型为[Spannable]返回[this]. 否则返回[Spannable]
+ * 3. 匹配字符串且[this]类型为[SpannableStringBuilder]返回[this], 否则返回[SpannableStringBuilder]
  */
 @JvmOverloads
-fun CharSequence.replaceSpan(oldValue: String, ignoreCase: Boolean = false, replacement: (MatchResult) -> Any?): CharSequence {
+fun CharSequence.replaceSpan(
+    oldValue: String,
+    ignoreCase: Boolean = false,
+    replacement: (MatchResult) -> Any?
+): CharSequence {
     val regex = if (ignoreCase) {
         Regex.escape(oldValue).toRegex(RegexOption.IGNORE_CASE)
     } else {
@@ -165,13 +184,23 @@ fun CharSequence.replaceSpan(oldValue: String, ignoreCase: Boolean = false, repl
  * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
  * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
  *
- * @return 如果没有匹配任何项会返回原来的[CharSequence]
+ * @return
+ * 1. 没有匹配任何项返回[this]
+ * 2. 匹配Span效果且[this]类型为[Spannable]返回[this]. 否则返回[Spannable]
+ * 3. 匹配字符串且[this]类型为[SpannableStringBuilder]返回[this], 否则返回[SpannableStringBuilder]
  */
 @JvmOverloads
-fun CharSequence.replaceSpan(regex: Regex, quoteGroup: Boolean = false, replacement: (MatchResult) -> Any?): CharSequence {
+fun CharSequence.replaceSpan(
+    regex: Regex,
+    quoteGroup: Boolean = false,
+    replacement: (MatchResult) -> Any?
+): CharSequence {
+    val sequence = regex.findAll(this)
+    val count = sequence.count()
+    if (count == 0) return this
     var spanBuilder = if (this is Spannable) this else SpannableStringBuilder(this)
     var offset = 0
-    regex.findAll(this).forEach { matchResult ->
+    sequence.forEach { matchResult ->
         val range = matchResult.range
         replacement(matchResult)?.let { spanned ->
             when (spanned) {
@@ -205,7 +234,7 @@ fun CharSequence.replaceSpan(regex: Regex, quoteGroup: Boolean = false, replacem
                         }
                     }
                     val matchLength = matchResult.value.length
-                    if (spanBuilder !is SpannableStringBuilder){
+                    if (spanBuilder !is SpannableStringBuilder) {
                         spanBuilder = SpannableStringBuilder(spanBuilder)
                     }
                     (spanBuilder as SpannableStringBuilder).replace(range.first + offset, range.first + offset + matchLength, adjustReplacement)
@@ -231,10 +260,17 @@ fun CharSequence.replaceSpan(regex: Regex, quoteGroup: Boolean = false, replacem
  * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
  * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
  *
- * @return 如果没有匹配任何项会返回原来的[CharSequence]
+ * @return
+ * 1. 没有匹配任何项返回[this]
+ * 2. 匹配Span效果且[this]类型为[Spannable]返回[this]. 否则返回[Spannable]
+ * 3. 匹配字符串且[this]类型为[SpannableStringBuilder]返回[this], 否则返回[SpannableStringBuilder]
  */
 @JvmOverloads
-fun CharSequence.replaceSpanFirst(oldValue: String, ignoreCase: Boolean = false, replacement: (MatchResult) -> Any?): CharSequence {
+fun CharSequence.replaceSpanFirst(
+    oldValue: String,
+    ignoreCase: Boolean = false,
+    replacement: (MatchResult) -> Any?
+): CharSequence {
     val regex = if (ignoreCase) {
         Regex.escape(oldValue).toRegex(RegexOption.IGNORE_CASE)
     } else {
@@ -256,10 +292,17 @@ fun CharSequence.replaceSpanFirst(oldValue: String, ignoreCase: Boolean = false,
  * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
  * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
  *
- * @return 如果没有匹配任何项会返回原来的[CharSequence]
+ * @return
+ * 1. 没有匹配任何项返回[this]
+ * 2. 匹配Span效果且[this]类型为[Spannable]返回[this]. 否则返回[Spannable]
+ * 3. 匹配字符串且[this]类型为[SpannableStringBuilder]返回[this], 否则返回[SpannableStringBuilder]
  */
 @JvmOverloads
-fun CharSequence.replaceSpanFirst(regex: Regex, quoteGroup: Boolean = false, replacement: (MatchResult) -> Any?): CharSequence {
+fun CharSequence.replaceSpanFirst(
+    regex: Regex,
+    quoteGroup: Boolean = false,
+    replacement: (MatchResult) -> Any?
+): CharSequence {
     val matchResult = regex.find(this) ?: return this
     var spanBuilder = if (this is Spannable) this else SpannableStringBuilder(this)
     val range = matchResult.range
@@ -295,7 +338,7 @@ fun CharSequence.replaceSpanFirst(regex: Regex, quoteGroup: Boolean = false, rep
                     }
                 }
                 val matchLength = matchResult.value.length
-                if (spanBuilder !is SpannableStringBuilder){
+                if (spanBuilder !is SpannableStringBuilder) {
                     spanBuilder = SpannableStringBuilder(spanBuilder)
                 }
                 (spanBuilder as SpannableStringBuilder).replace(range.first, range.first + matchLength, adjustReplacement)
@@ -319,10 +362,17 @@ fun CharSequence.replaceSpanFirst(regex: Regex, quoteGroup: Boolean = false, rep
  * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
  * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
  *
- * @return 如果没有匹配任何项会返回原来的[CharSequence]
+ * @return
+ * 1. 没有匹配任何项返回[this]
+ * 2. 匹配Span效果且[this]类型为[Spannable]返回[this]. 否则返回[Spannable]
+ * 3. 匹配字符串且[this]类型为[SpannableStringBuilder]返回[this], 否则返回[SpannableStringBuilder]
  */
 @JvmOverloads
-fun CharSequence.replaceSpanLast(oldValue: String, ignoreCase: Boolean = false, replacement: (MatchResult) -> Any?): CharSequence {
+fun CharSequence.replaceSpanLast(
+    oldValue: String,
+    ignoreCase: Boolean = false,
+    replacement: (MatchResult) -> Any?
+): CharSequence {
     val regex = if (ignoreCase) {
         Regex.escape(oldValue).toRegex(RegexOption.IGNORE_CASE)
     } else {
@@ -344,10 +394,17 @@ fun CharSequence.replaceSpanLast(oldValue: String, ignoreCase: Boolean = false, 
  * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
  * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
  *
- * @return 如果没有匹配任何项会返回原来的[CharSequence]
+ * @return
+ * 1. 没有匹配任何项返回[this]
+ * 2. 匹配Span效果且[this]类型为[Spannable]返回[this]. 否则返回[Spannable]
+ * 3. 匹配字符串且[this]类型为[SpannableStringBuilder]返回[this], 否则返回[SpannableStringBuilder]
  */
 @JvmOverloads
-fun CharSequence.replaceSpanLast(regex: Regex, quoteGroup: Boolean = false, replacement: (MatchResult) -> Any?): CharSequence {
+fun CharSequence.replaceSpanLast(
+    regex: Regex,
+    quoteGroup: Boolean = false,
+    replacement: (MatchResult) -> Any?
+): CharSequence {
     val matchResult = regex.findAll(this).lastOrNull() ?: return this
     var spanBuilder = if (this is Spannable) this else SpannableStringBuilder(this)
     val range = matchResult.range
@@ -383,7 +440,7 @@ fun CharSequence.replaceSpanLast(regex: Regex, quoteGroup: Boolean = false, repl
                     }
                 }
                 val matchLength = matchResult.value.length
-                if (spanBuilder !is SpannableStringBuilder){
+                if (spanBuilder !is SpannableStringBuilder) {
                     spanBuilder = SpannableStringBuilder(spanBuilder)
                 }
                 (spanBuilder as SpannableStringBuilder).replace(range.first, range.first + matchLength, adjustReplacement)
