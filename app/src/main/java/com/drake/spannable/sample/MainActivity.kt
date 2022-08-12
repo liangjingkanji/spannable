@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Drake, Inc.
+ * Copyright (C) 2018 Drake, https://github.com/liangjingkanji
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,12 @@ import android.text.style.AbsoluteSizeSpan
 import android.text.style.StyleSpan
 import android.text.style.URLSpan
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.drake.engine.utils.dp
 import com.drake.spannable.addSpan
 import com.drake.spannable.movement.ClickableMovementMethod
 import com.drake.spannable.replaceSpan
 import com.drake.spannable.replaceSpanFirst
+import com.drake.spannable.sample.base.BaseMenuActivity
 import com.drake.spannable.sample.databinding.ActivityMainBinding
 import com.drake.spannable.setSpan
 import com.drake.spannable.span.CenterImageSpan
@@ -39,7 +39,7 @@ import com.drake.spannable.span.GlideImageSpan
 import com.drake.spannable.span.HighlightSpan
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseMenuActivity() {
 
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
                 HighlightSpan("#ed6a2c") {
                     Toast.makeText(this@MainActivity, "点击用户 ${matchResult.value}", Toast.LENGTH_SHORT).show()
                 }
-            }.replaceSpan("#[^#]+?(?=\\s|\$)".toRegex()) { matchResult ->
+            }.replaceSpan("#[^@]+?(?=\\s|\$)".toRegex()) { matchResult ->
                 HighlightSpan("#4a70d2", Typeface.defaultFromStyle(Typeface.BOLD)) {
                     Toast.makeText(this@MainActivity, "点击标签 ${matchResult.value}", Toast.LENGTH_SHORT).show()
                 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_image_text"
+        android:title="图文混排" />
+    <item
+        android:id="@+id/menu_input"
+        android:title="富文本输入" />
+</menu>
