@@ -31,24 +31,26 @@ class RichInputActivity : BaseMenuActivity() {
 
     private val binding by lazy { ActivityRichInputBinding.inflate(layoutInflater) }
 
+    // 匹配规则
+    private val matchRules = mapOf(
+        "@[^@]+?(?=\\s|\$)".toRegex() to HighlightSpan("#ed6a2c"),
+        "#[^@]+?(?=\\s|\$)".toRegex() to HighlightSpan("#4a70d2", Typeface.defaultFromStyle(Typeface.BOLD)),
+        "蚂蚁".toRegex() to CenterImageSpan(this, R.drawable.ic_ant).setDrawableSize(50.dp),
+        "生气|angry".toRegex() to CenterImageSpan(this, R.drawable.ic_angry).setDrawableSize(50.dp),
+        "开心|happy".toRegex() to CenterImageSpan(this, R.drawable.ic_happy).setDrawableSize(50.dp)
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-
         // 包含 @用户 #标签 表情包 等自动替换规则
         binding.etInput.addTextChangedListener(object : ModifyTextWatcher() {
             override fun onModify(s: Editable) {
-                s.replaceSpan("@[^@]+?(?=\\s|\$)".toRegex()) {
-                    HighlightSpan("#ed6a2c")
-                }.replaceSpan("#[^@]+?(?=\\s|\$)".toRegex()) {
-                    HighlightSpan("#4a70d2", Typeface.defaultFromStyle(Typeface.BOLD))
-                }.replaceSpan("蚂蚁") {
-                    CenterImageSpan(this@RichInputActivity, R.drawable.ic_ant).setDrawableSize(50.dp)
-                }.replaceSpan("生气|angry".toRegex()) {
-                    CenterImageSpan(this@RichInputActivity, R.drawable.ic_angry).setDrawableSize(50.dp)
-                }.replaceSpan("开心".toRegex()) {
-                    CenterImageSpan(this@RichInputActivity, R.drawable.ic_happy).setDrawableSize(50.dp)
+                matchRules.forEach { rule ->
+                    s.replaceSpan(rule.key) {
+                        rule.value
+                    }
                 }
             }
         })
