@@ -25,6 +25,7 @@ import android.text.style.AbsoluteSizeSpan
 import android.text.style.StyleSpan
 import android.text.style.URLSpan
 import android.widget.Toast
+import com.bumptech.glide.request.RequestOptions
 import com.drake.engine.utils.dp
 import com.drake.spannable.addSpan
 import com.drake.spannable.movement.ClickableMovementMethod
@@ -85,17 +86,17 @@ class MainActivity : BaseMenuActivity() {
             .addSpan("image", CenterImageSpan(this, R.drawable.ic_touch).setDrawableSize(20.dp).setMarginHorizontal(4.dp)).addSpan("点击付款")
 
         // 通过替换方式展示价格
-        binding.tv6.text = "¥39.9 1000+ 人付款 "
+        binding.tv6.text = "头像".setSpan(
+            GlideImageSpan(binding.tv6, "https://avatars.githubusercontent.com/u/21078112?v=4")
+                .setRequestOption(RequestOptions.circleCropTransform()) // 圆形裁剪图片
+                .setAlign(GlideImageSpan.Align.BOTTOM)
+                .setDrawableSize(50.dp)
+        ).addSpan("¥39.9 1000+ 人付款 ")
             .replaceSpan("¥[\\d\\.]+".toRegex()) { // 匹配价格颜色(包含货币符号)
                 ColorSpan("#479fd1")
             }.replaceSpanFirst("[\\d\\.]+".toRegex()) { // 匹配价格字号
                 AbsoluteSizeSpan(18, true)
-            }.addSpan(
-                "image",
-                GlideImageSpan(binding.tv6, "https://s1.hdslb.com/bfs/static/blive/blfe-dynamic-web/static/img/no-login.9be609c5.png")
-                    .setAlign(GlideImageSpan.Align.BOTTOM)
-                    .setDrawableSize(50.dp)
-            )
+            }
 
         // GIF图文混排
         binding.tv7.text = "播放GIF动画[晕]表情".replaceSpan("[晕]") {
