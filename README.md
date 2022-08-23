@@ -10,7 +10,7 @@
 <a href="https://jitpack.io/#liangjingkanji/spannable"><img src="https://jitpack.io/v/liangjingkanji/spannable.svg"/></a>
 <img src="https://img.shields.io/badge/language-kotlin-orange.svg"/>
 <img src="https://img.shields.io/badge/license-Apache-blue"/>
-<a href="https://jq.qq.com/?_wv=1027&k=vWsXSNBJ"><img src="https://img.shields.io/badge/QQ群-752854893-blue"/></a>
+<img src="https://raw.githubusercontent.com/liangjingkanji/liangjingkanji/master/img/group.svg"/>
 </p>
 
 <p align="center">
