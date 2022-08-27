@@ -17,7 +17,6 @@
 package com.drake.spannable
 
 import android.text.Spannable
-import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import androidx.core.text.set
@@ -27,13 +26,13 @@ import androidx.core.text.set
  * @param what 文字效果, 如果为数组或者集合则设置多个
  * @param flags 参考 [Spanned.SPAN_EXCLUSIVE_EXCLUSIVE]
  *
- * @return 如果[this]不为[Spannable]则将返回一个新的对象
+ * @return 如果[this]不为[Spannable]则将返回一个新的[SpannableStringBuilder]对象
  */
 @JvmOverloads
 fun CharSequence.setSpan(what: Any?, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE): CharSequence {
     val str = when (this) {
         is Spannable -> this
-        else -> SpannableString(this)
+        else -> SpannableStringBuilder(this)
     }
     when (what) {
         is Array<*> -> what.forEach {
@@ -54,7 +53,7 @@ fun CharSequence.setSpan(what: Any?, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSI
  * @param end 结束索引
  * @param flags 参考 [Spanned.SPAN_EXCLUSIVE_EXCLUSIVE]
  *
- * @return 如果[this]不为[Spannable]则将返回一个新的对象
+ * @return 如果[this]不为[Spannable]则将返回一个新的[SpannableStringBuilder]对象
  */
 @JvmOverloads
 fun CharSequence.setSpan(
@@ -65,7 +64,7 @@ fun CharSequence.setSpan(
 ): CharSequence {
     val str = when (this) {
         is Spannable -> this
-        else -> SpannableString(this)
+        else -> SpannableStringBuilder(this)
     }
     when (what) {
         is Array<*> -> what.forEach {
@@ -154,7 +153,7 @@ fun CharSequence.addSpan(
  *
  * @return
  * 1. 没有匹配任何项返回[this]
- * 2. 匹配Span效果且[this]类型为[Spannable]返回[this]. 否则返回[Spannable]
+ * 2. 匹配Span效果且[this]类型为[Spannable]返回[this]. 否则返回[SpannableStringBuilder]
  * 3. 匹配字符串且[this]类型为[SpannableStringBuilder]返回[this], 否则返回[SpannableStringBuilder]
  */
 @JvmOverloads
@@ -186,7 +185,7 @@ fun CharSequence.replaceSpan(
  *
  * @return
  * 1. 没有匹配任何项返回[this]
- * 2. 匹配Span效果且[this]类型为[Spannable]返回[this]. 否则返回[Spannable]
+ * 2. 匹配Span效果且[this]类型为[Spannable]返回[this]. 否则返回[SpannableStringBuilder]
  * 3. 匹配字符串且[this]类型为[SpannableStringBuilder]返回[this], 否则返回[SpannableStringBuilder]
  */
 @JvmOverloads
@@ -228,7 +227,7 @@ fun CharSequence.replaceSpan(
                                 if (adjustReplacement is Spannable) {
                                     adjustReplacement.setSpan(it)
                                 } else {
-                                    adjustReplacement = SpannableString(adjustReplacement).apply { setSpan(it) }
+                                    adjustReplacement = SpannableStringBuilder(adjustReplacement).apply { setSpan(it) }
                                 }
                             }
                         }
@@ -262,7 +261,7 @@ fun CharSequence.replaceSpan(
  *
  * @return
  * 1. 没有匹配任何项返回[this]
- * 2. 匹配Span效果且[this]类型为[Spannable]返回[this]. 否则返回[Spannable]
+ * 2. 匹配Span效果且[this]类型为[Spannable]返回[this]. 否则返回[SpannableStringBuilder]
  * 3. 匹配字符串且[this]类型为[SpannableStringBuilder]返回[this], 否则返回[SpannableStringBuilder]
  */
 @JvmOverloads
@@ -294,7 +293,7 @@ fun CharSequence.replaceSpanFirst(
  *
  * @return
  * 1. 没有匹配任何项返回[this]
- * 2. 匹配Span效果且[this]类型为[Spannable]返回[this]. 否则返回[Spannable]
+ * 2. 匹配Span效果且[this]类型为[Spannable]返回[this]. 否则返回[SpannableStringBuilder]
  * 3. 匹配字符串且[this]类型为[SpannableStringBuilder]返回[this], 否则返回[SpannableStringBuilder]
  */
 @JvmOverloads
@@ -332,7 +331,7 @@ fun CharSequence.replaceSpanFirst(
                             if (adjustReplacement is Spannable) {
                                 adjustReplacement.setSpan(it)
                             } else {
-                                adjustReplacement = SpannableString(adjustReplacement).apply { setSpan(it) }
+                                adjustReplacement = SpannableStringBuilder(adjustReplacement).apply { setSpan(it) }
                             }
                         }
                     }
@@ -364,7 +363,7 @@ fun CharSequence.replaceSpanFirst(
  *
  * @return
  * 1. 没有匹配任何项返回[this]
- * 2. 匹配Span效果且[this]类型为[Spannable]返回[this]. 否则返回[Spannable]
+ * 2. 匹配Span效果且[this]类型为[Spannable]返回[this]. 否则返回[SpannableStringBuilder]
  * 3. 匹配字符串且[this]类型为[SpannableStringBuilder]返回[this], 否则返回[SpannableStringBuilder]
  */
 @JvmOverloads
@@ -396,7 +395,7 @@ fun CharSequence.replaceSpanLast(
  *
  * @return
  * 1. 没有匹配任何项返回[this]
- * 2. 匹配Span效果且[this]类型为[Spannable]返回[this]. 否则返回[Spannable]
+ * 2. 匹配Span效果且[this]类型为[Spannable]返回[this]. 否则返回[SpannableStringBuilder]
  * 3. 匹配字符串且[this]类型为[SpannableStringBuilder]返回[this], 否则返回[SpannableStringBuilder]
  */
 @JvmOverloads
@@ -434,7 +433,7 @@ fun CharSequence.replaceSpanLast(
                             if (adjustReplacement is Spannable) {
                                 adjustReplacement.setSpan(it)
                             } else {
-                                adjustReplacement = SpannableString(adjustReplacement).apply { setSpan(it) }
+                                adjustReplacement = SpannableStringBuilder(adjustReplacement).apply { setSpan(it) }
                             }
                         }
                     }
