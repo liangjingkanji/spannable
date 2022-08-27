@@ -17,13 +17,17 @@
 package com.drake.spannable.span
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.text.TextPaint
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
 import android.view.Gravity
-import androidx.annotation.ColorInt
+import androidx.core.text.getSpans
 import java.lang.ref.WeakReference
 
 /**
@@ -138,12 +142,8 @@ class CenterImageSpan : ImageSpan {
         canvas.translate(x + marginLeft, transY.toFloat())
         drawable.draw(canvas)
 
-        // 绘制文字
+        // draw text
         if (textVisibility) {
-            textSize?.let { paint.textSize = it.toFloat() }
-            textColor?.let { paint.color = it }
-            typeface?.let { paint.typeface = it }
-            (paint as? TextPaint)?.let { paintConfig?.invoke(it) }
             val textWidth = paint.measureText(text, start, end)
             val textDrawRect = Rect()
             val textContainerRect = Rect(bounds)
@@ -154,6 +154,12 @@ class CenterImageSpan : ImageSpan {
                 textContainerRect,
                 textDrawRect
             )
+            if (text is Spanned) {
+                // draw text color
+                text.getSpans<ForegroundColorSpan>(start, end).lastOrNull()?.let {
+                    paint.color = it.foregroundColor
+                }
+            }
             canvas.drawText(
                 text, start, end,
                 (textDrawRect.left + textOffsetRect.left - textOffsetRect.right).toFloat(),
@@ -204,10 +210,6 @@ class CenterImageSpan : ImageSpan {
     private var textOffsetRect = Rect()
     private var textGravity = Gravity.CENTER
     private var textVisibility = false
-    private var textSize: Int? = null
-    private var textColor: Int? = null
-    private var typeface: Typeface? = null
-    private var paintConfig: (TextPaint.() -> Unit)? = null
 
     /**
      * 当前为背景图片, 这会导致显示文字内容, 但图片不会根据文字内容自动调整
@@ -218,7 +220,9 @@ class CenterImageSpan : ImageSpan {
         this.textVisibility = visibility
     }
 
-    /** 文字偏移值 */
+    /**
+     * 文字偏移值
+     */
     @JvmOverloads
     fun setTextOffset(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0) = apply {
         textOffsetRect.set(left, top, right, bottom)
@@ -230,30 +234,6 @@ class CenterImageSpan : ImageSpan {
      */
     fun setTextGravity(gravity: Int) = apply {
         this.textGravity = gravity
-    }
-
-    /** 配置文字画笔, 可以配置颜色/粗体/斜体等效果 */
-    fun setTextPaint(paint: TextPaint.() -> Unit) = apply {
-        paintConfig = paint
-    }
-
-    /**
-     * 设置文字样式, 例如[android.graphics.Typeface.BOLD]粗体
-     */
-    fun setTypeface(typeface: Typeface) = apply {
-        this.typeface = typeface
-    }
-
-    fun setTextSize(size: Int) = apply {
-        textSize = size
-    }
-
-    fun setTextColor(color: String) = apply {
-        textColor = Color.parseColor(color)
-    }
-
-    fun setTextColor(@ColorInt color: Int) = apply {
-        textColor = color
     }
     //</editor-fold>
 
