@@ -45,20 +45,16 @@ import java.lang.ref.WeakReference
 class CenterImageSpan : ImageSpan {
 
     /** 图片宽度 */
-    var drawableWidth: Int = 0
-        private set
+    private var drawableWidth: Int = 0
 
     /** 图片高度 */
-    var drawableHeight: Int = 0
-        private set
+    private var drawableHeight: Int = 0
 
     /** 图片左间距 */
-    var marginLeft: Int = 0
-        private set
+    private var marginLeft: Int = 0
 
     /** 图片右间距 */
-    var marginRight: Int = 0
-        private set
+    private var marginRight: Int = 0
 
     private var drawableRef: WeakReference<Drawable>? = null
 
@@ -179,6 +175,7 @@ class CenterImageSpan : ImageSpan {
 
     private var align: Align = Align.CENTER
 
+    //<editor-fold desc="Image">
     /**
      * 设置图片垂直对其方式
      * 图片默认垂直居中对齐文字: [Align.CENTER]
@@ -205,6 +202,7 @@ class CenterImageSpan : ImageSpan {
         this.marginRight = right
         drawableRef?.clear()
     }
+    //</editor-fold>
 
     //<editor-fold desc="Text">
     private var textOffsetRect = Rect()

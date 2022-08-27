@@ -53,20 +53,16 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
     private var loopCount: Int = GifDrawable.LOOP_FOREVER
 
     /** 图片宽度 */
-    var drawableWidth: Int = 0
-        private set
+    private var drawableWidth: Int = 0
 
     /** 图片高度 */
-    var drawableHeight: Int = 0
-        private set
+    private var drawableHeight: Int = 0
 
     /** 图片左间距 */
-    var marginLeft: Int = 0
-        private set
+    private var marginLeft: Int = 0
 
     /** 图片右间距 */
-    var marginRight: Int = 0
-        private set
+    private var marginRight: Int = 0
 
     private var requestOption: RequestOptions = RequestOptions()
     private var drawableRef: AtomicReference<Drawable> = AtomicReference()
@@ -238,17 +234,6 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
         setBounds(0, 0, drawableWidth, drawableHeight)
     }
 
-
-    /**
-     * 配置Glide请求选项, 例如占位图、加载失败图等
-     * 如果使用[RequestOptions.placeholder]占位图会导致默认使用占位图宽高, 除非你使用[setDrawableSize]覆盖默认值
-     *
-     * 默认会使用[RequestOptions.fitCenterTransform]保持图片纵横比例不变, 当然你可以覆盖该配置
-     */
-    fun setRequestOption(requestOption: RequestOptions) = apply {
-        this.requestOption = requestOption
-    }
-
     enum class Align {
         BASELINE,
         CENTER,
@@ -257,6 +242,7 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
 
     private var align: Align = Align.CENTER
 
+    //<editor-fold desc="Image">
     /**
      * 设置图片垂直对其方式
      * 图片默认垂直居中对齐文字: [Align.CENTER]
@@ -284,10 +270,21 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
         drawableRef.set(null)
     }
 
+    /**
+     * 配置Glide请求选项, 例如占位图、加载失败图等
+     * 如果使用[RequestOptions.placeholder]占位图会导致默认使用占位图宽高, 除非你使用[setDrawableSize]覆盖默认值
+     *
+     * 默认会使用[RequestOptions.fitCenterTransform]保持图片纵横比例不变, 当然你可以覆盖该配置
+     */
+    fun setRequestOption(requestOption: RequestOptions) = apply {
+        this.requestOption = requestOption
+    }
+
     /** GIF动画播放循环次数, 默认无限循环 */
     fun setLoopCount(loopCount: Int) = apply {
         this.loopCount = loopCount
     }
+    //</editor-fold>
 
     //<editor-fold desc="Text">
     private var textOffsetRect = Rect()
