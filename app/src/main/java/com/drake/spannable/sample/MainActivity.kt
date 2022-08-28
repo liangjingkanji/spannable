@@ -102,6 +102,29 @@ class MainActivity : BaseMenuActivity() {
         binding.tv7.text = "播放GIF动画[晕]表情".replaceSpan("[晕]") {
             GlideImageSpan(binding.tv7, R.drawable.ic_gif).setDrawableSize(50.dp)
         }
+
+        binding.tv8.text = "image".setSpan(
+            listOf(
+                CenterImageSpan(this, R.drawable.bg_label)
+                    .setDrawableSize(-1)
+                    .setPadding(10.dp, 5.dp, 10.dp, 5.dp)
+                    .setTextVisibility(),
+                ColorSpan(Color.WHITE),
+                AbsoluteSizeSpan(40, true),
+                StyleSpan(Typeface.BOLD)
+            )
+        ).addSpan("今天是个好日子")
+
+        binding.tv9.text = "image".setSpan(
+            listOf(
+                CenterImageSpan(this, R.drawable.bg_msg_bubble_left)
+                    .setDrawableSize(-1)
+                    .setTextVisibility(),
+                ColorSpan(Color.WHITE),
+                AbsoluteSizeSpan(40, true),
+                StyleSpan(Typeface.BOLD)
+            )
+        ).addSpan("今天是个好日子")
     }
 }
 
