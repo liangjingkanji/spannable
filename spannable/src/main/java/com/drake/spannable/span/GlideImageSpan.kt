@@ -65,8 +65,94 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
     private var marginRight: Int = 0
 
     private var requestOption: RequestOptions = RequestOptions()
+
     private var drawableRef: AtomicReference<Drawable> = AtomicReference()
 
+    /** 文字显示区域 */
+    private var textDisplayRect = Rect()
+
+    /** 图片原始间距 */
+    private var drawableOriginPadding = Rect()
+
+    fun getDrawable(): Drawable? {
+        if (drawableRef.get() == null) {
+            val placeHolder = try {
+                requestOption.placeholderDrawable ?: view.context.resources.getDrawable(
+                    requestOption.placeholderId
+                )
+            } catch (e: Exception) {
+                null
+            }
+            placeHolder?.setFixedRatioZoom()
+            val width = if (drawableWidth > 0) drawableWidth else SIZE_ORIGINAL
+            val height = if (drawableHeight > 0) drawableHeight else SIZE_ORIGINAL
+
+            Glide.with(view.context).load(url).fitCenter().apply(requestOption).into(object : CustomTarget<Drawable>(
+                width,
+                height
+            ) {
+                override fun onResourceReady(
+                    resource: Drawable,
+                    transition: Transition<in Drawable>?
+                ) {
+                    if (resource is GifDrawable) {
+                        resource.callback = drawableCallback
+                        resource.setLoopCount(loopCount)
+                        resource.start()
+                    }
+                    resource.setBounds(0, 0, resource.intrinsicWidth, resource.intrinsicHeight)
+                    drawableRef.set(resource)
+                    view.invalidate()
+                }
+
+                override fun onLoadStarted(placeholder: Drawable?) {
+                    if (placeholder != null) {
+                        placeholder.setFixedRatioZoom()
+                        drawableRef.set(placeholder)
+                    }
+                }
+
+                override fun onLoadFailed(errorDrawable: Drawable?) {
+                    if (errorDrawable != null && errorDrawable != drawableRef.get()) {
+                        errorDrawable.setFixedRatioZoom()
+                        drawableRef.set(errorDrawable)
+                        view.invalidate()
+                    }
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {
+                }
+            })
+        }
+        return drawableRef.get()
+    }
+
+    /** 设置等比例缩放图片 */
+    private fun Drawable.setFixedRatioZoom() {
+        val ratio = intrinsicWidth.toDouble() / intrinsicHeight
+        var width = when {
+            drawableWidth > 0 -> drawableWidth
+            drawableWidth == -1 -> textDisplayRect.width()
+            else -> intrinsicWidth
+        }
+        var height = when {
+            drawableHeight > 0 -> drawableHeight
+            drawableWidth == -1 -> textDisplayRect.height()
+            else -> intrinsicHeight
+        }
+
+        if (drawableWidth != -1 && intrinsicWidth > intrinsicHeight) {
+            height = (width / ratio).toInt()
+        } else if (drawableHeight != -1 && intrinsicWidth < intrinsicHeight) {
+            width = (height * ratio).toInt()
+        }
+
+        getPadding(drawableOriginPadding)
+        width += drawablePadding.left + drawablePadding.right + drawableOriginPadding.left + drawableOriginPadding.right
+        height += drawablePadding.top + drawablePadding.bottom + drawableOriginPadding.top + drawableOriginPadding.bottom
+
+        bounds.set(0, 0, width, height)
+    }
 
     override fun getSize(
         paint: Paint,
@@ -75,6 +161,9 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
         end: Int,
         fm: Paint.FontMetricsInt?
     ): Int {
+        if (drawableWidth == -1 || drawableHeight == -1) {
+            paint.getTextBounds(text.toString(), start, end, textDisplayRect)
+        }
         val bounds = getDrawable()?.bounds ?: Rect(0, 0, drawableWidth, drawableHeight)
         if (fm != null) {
             val fontMetricsInt = paint.fontMetricsInt
@@ -110,6 +199,9 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
         bottom: Int,
         paint: Paint
     ) {
+        if (drawableWidth == -1 || drawableHeight == -1) {
+            paint.getTextBounds(text.toString(), start, end, textDisplayRect)
+        }
         getDrawable()?.let { drawable ->
             canvas.save()
             val bounds = drawable.bounds
@@ -168,72 +260,6 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
         }
     }
 
-    fun getDrawable(): Drawable? {
-        if (drawableRef.get() == null) {
-            val placeHolder = try {
-                requestOption.placeholderDrawable ?: view.context.resources.getDrawable(
-                    requestOption.placeholderId
-                )
-            } catch (e: Exception) {
-                null
-            }
-            placeHolder?.setFixedRatioZoom()
-            val width = if (drawableWidth > 0) drawableWidth else SIZE_ORIGINAL
-            val height = if (drawableHeight > 0) drawableHeight else SIZE_ORIGINAL
-
-            Glide.with(view.context).load(url).fitCenter().apply(requestOption).into(object : CustomTarget<Drawable>(
-                width,
-                height
-            ) {
-                override fun onResourceReady(
-                    resource: Drawable,
-                    transition: Transition<in Drawable>?
-                ) {
-                    if (resource is GifDrawable) {
-                        resource.callback = drawableCallback
-                        resource.setLoopCount(loopCount)
-                        resource.start()
-                    }
-                    resource.setBounds(0, 0, resource.intrinsicWidth, resource.intrinsicHeight)
-                    drawableRef.set(resource)
-                    view.invalidate()
-                }
-
-                override fun onLoadStarted(placeholder: Drawable?) {
-                    if (placeholder != null) {
-                        placeholder.setFixedRatioZoom()
-                        drawableRef.set(placeholder)
-                    }
-                }
-
-                override fun onLoadFailed(errorDrawable: Drawable?) {
-                    if (errorDrawable != null && errorDrawable != drawableRef.get()) {
-                        errorDrawable.setFixedRatioZoom()
-                        drawableRef.set(errorDrawable)
-                        view.invalidate()
-                    }
-                }
-
-                override fun onLoadCleared(placeholder: Drawable?) {
-                }
-            })
-        }
-        return drawableRef.get()
-    }
-
-    /** 设置等比例缩放图片, 这会导致[drawableWidth]和[drawableHeight]根据图片原始比例变化 */
-    private fun Drawable.setFixedRatioZoom() {
-        val ratio = intrinsicWidth.toDouble() / intrinsicHeight
-        drawableWidth = if (drawableWidth > 0) drawableWidth else intrinsicWidth
-        drawableHeight = if (drawableHeight > 0) drawableHeight else intrinsicHeight
-        if (intrinsicWidth > intrinsicHeight) {
-            drawableHeight = (drawableWidth / ratio).toInt()
-        } else if (intrinsicWidth < intrinsicHeight) {
-            drawableWidth = (drawableHeight * ratio).toInt()
-        }
-        setBounds(0, 0, drawableWidth, drawableHeight)
-    }
-
     enum class Align {
         BASELINE,
         CENTER,
@@ -268,6 +294,16 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
         this.marginLeft = left
         this.marginRight = right
         drawableRef.set(null)
+    }
+
+
+    private var drawablePadding = Rect()
+
+    /**
+     * 设置图片内间距
+     */
+    fun setPadding(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0) = apply {
+        drawablePadding.set(left, top, right, bottom)
     }
 
     /**

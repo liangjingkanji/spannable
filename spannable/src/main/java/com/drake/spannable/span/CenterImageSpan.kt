@@ -58,6 +58,12 @@ class CenterImageSpan : ImageSpan {
 
     private var drawableRef: WeakReference<Drawable>? = null
 
+    /** 文字显示区域 */
+    private var textDisplayRect = Rect()
+
+    /** 图片原始间距 */
+    private var drawableOriginPadding = Rect()
+
     override fun getDrawable(): Drawable {
         return drawableRef?.get() ?: super.getDrawable().apply {
             setFixedRatioZoom()
@@ -65,17 +71,31 @@ class CenterImageSpan : ImageSpan {
         }
     }
 
-    /** 设置等比例缩放图片, 这会导致[drawableWidth]和[drawableHeight]根据图片原始比例变化 */
+    /** 设置等比例缩放图片 */
     private fun Drawable.setFixedRatioZoom() {
         val ratio = intrinsicWidth.toDouble() / intrinsicHeight
-        drawableWidth = if (drawableWidth > 0) drawableWidth else intrinsicWidth
-        drawableHeight = if (drawableHeight > 0) drawableHeight else intrinsicHeight
-        if (intrinsicWidth > intrinsicHeight) {
-            drawableHeight = (drawableWidth / ratio).toInt()
-        } else if (intrinsicWidth < intrinsicHeight) {
-            drawableWidth = (drawableHeight * ratio).toInt()
+        var width = when {
+            drawableWidth > 0 -> drawableWidth
+            drawableWidth == -1 -> textDisplayRect.width()
+            else -> intrinsicWidth
         }
-        setBounds(0, 0, drawableWidth, drawableHeight)
+        var height = when {
+            drawableHeight > 0 -> drawableHeight
+            drawableWidth == -1 -> textDisplayRect.height()
+            else -> intrinsicHeight
+        }
+
+        if (drawableWidth != -1 && intrinsicWidth > intrinsicHeight) {
+            height = (width / ratio).toInt()
+        } else if (drawableHeight != -1 && intrinsicWidth < intrinsicHeight) {
+            width = (height * ratio).toInt()
+        }
+
+        getPadding(drawableOriginPadding)
+        width += drawablePadding.left + drawablePadding.right + drawableOriginPadding.left + drawableOriginPadding.right
+        height += drawablePadding.top + drawablePadding.bottom + drawableOriginPadding.top + drawableOriginPadding.bottom
+
+        bounds.set(0, 0, width, height)
     }
 
     constructor(drawable: Drawable) : super(drawable)
@@ -91,6 +111,9 @@ class CenterImageSpan : ImageSpan {
         end: Int,
         fm: Paint.FontMetricsInt?
     ): Int {
+        if (drawableWidth == -1 || drawableHeight == -1) {
+            paint.getTextBounds(text.toString(), start, end, textDisplayRect)
+        }
         val bounds = drawable.bounds
         if (fm != null) {
             val fontMetricsInt = paint.fontMetricsInt
@@ -127,7 +150,11 @@ class CenterImageSpan : ImageSpan {
         bottom: Int,
         paint: Paint
     ) {
+        if (drawableWidth == -1 || drawableHeight == -1) {
+            paint.getTextBounds(text.toString(), start, end, textDisplayRect)
+        }
         canvas.save()
+        val drawable = drawable
         val bounds = drawable.bounds
         var transY = bottom - bounds.bottom
         if (align == Align.BASELINE) {
@@ -137,6 +164,7 @@ class CenterImageSpan : ImageSpan {
         }
         canvas.translate(x + marginLeft, transY.toFloat())
         drawable.draw(canvas)
+        canvas.translate(-drawablePadding.width() / 2f - drawableOriginPadding.right, transY.toFloat() - drawablePadding.height() / 2f)
 
         // draw text
         if (textVisibility) {
@@ -158,8 +186,8 @@ class CenterImageSpan : ImageSpan {
             }
             canvas.drawText(
                 text, start, end,
-                (textDrawRect.left + textOffsetRect.left - textOffsetRect.right).toFloat(),
-                (textDrawRect.bottom - (paint.fontMetricsInt.descent / 2) + textOffsetRect.top - textOffsetRect.bottom).toFloat(),
+                (textDrawRect.left + textOffset.left - textOffset.right).toFloat(),
+                (textDrawRect.bottom - (paint.fontMetricsInt.descent / 2) + textOffset.top - textOffset.bottom).toFloat(),
                 paint
             )
         }
@@ -187,6 +215,8 @@ class CenterImageSpan : ImageSpan {
     /**
      * 设置图片宽高
      * 如果参数值为0则表示使用图片原始宽高, 无论宽高值如何图片都将会按照固定比例缩放, 你无需但需错误值导致图片拉伸变形
+     * @param  width 指定图片宽度, -1 表示根据文字宽度自动设置图片宽度
+     * @param  height 指定图片高度, -1 表示根据文字高度自动设置图片宽度
      */
     @JvmOverloads
     fun setDrawableSize(width: Int, height: Int = width) = apply {
@@ -202,10 +232,19 @@ class CenterImageSpan : ImageSpan {
         this.marginRight = right
         drawableRef?.clear()
     }
+
+    private var drawablePadding = Rect()
+
+    /**
+     * 设置图片内间距
+     */
+    fun setPadding(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0) = apply {
+        drawablePadding.set(left, top, right, bottom)
+    }
     //</editor-fold>
 
     //<editor-fold desc="Text">
-    private var textOffsetRect = Rect()
+    private var textOffset = Rect()
     private var textGravity = Gravity.CENTER
     private var textVisibility = false
 
@@ -223,7 +262,7 @@ class CenterImageSpan : ImageSpan {
      */
     @JvmOverloads
     fun setTextOffset(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0) = apply {
-        textOffsetRect.set(left, top, right, bottom)
+        textOffset.set(left, top, right, bottom)
     }
 
     /**
