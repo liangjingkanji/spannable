@@ -2,7 +2,7 @@
 
 <br>
 <p align="center">
-<img src="https://user-images.githubusercontent.com/21078112/162008072-a3ec82c7-1154-41c7-8a33-3159bd786872.png" width="350"/>
+<img src="https://raw.githubusercontent.com/liangjingkanji/spannable/master/preview_img.png" width="450"/><br>
 <img src="https://user-images.githubusercontent.com/21078112/184396518-4022db12-0fa9-48a0-97c1-22960db9362b.png" width="350"/>
 </p>
 
@@ -50,8 +50,8 @@
 
 | Span | 描述 |
 |-|-|
-| CenterImageSpan | 垂直对齐方式/图片宽高/固定图片比例/显示文字 |
-| GlideImageSpan | 网络图片/GIF动画/垂直对齐方式/图片宽高/固定图片比例/显示文字, 要求依赖[Glide](https://github.com/bumptech/glide) |
+| CenterImageSpan | 垂直对齐方式/图片宽高/固定图片比例/显示文字/Shape/.9PNG |
+| GlideImageSpan | 网络图片/GIF动画/垂直对齐方式/图片宽高/固定图片比例/显示文字/Shape/.9PNG, Require [Glide](https://github.com/bumptech/glide) |
 | MarginSpan | 文字间距 |
 | ColorSpan | 快速创建文字颜色 |
 | HighlightSpan | 创建字体颜色/字体样式/可点击效果 |

@@ -24,6 +24,7 @@ import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.text.Spanned
+import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
 import android.view.Gravity
@@ -37,6 +38,8 @@ import java.lang.ref.WeakReference
  * 图片宽高且保持固定比例
  * 图片水平间距
  * 图片显示文字
+ * shape自适应文字
+ * .9PNG自适应文字
  *
  * 默认图片垂直居中对齐文字, 使用[setAlign]可指定
  *
@@ -50,13 +53,19 @@ class CenterImageSpan : ImageSpan {
     /** 图片高度 */
     private var drawableHeight: Int = 0
 
-    /** 图片左间距 */
-    private var marginLeft: Int = 0
+    /** 图片间距 */
+    private var drawableMargin: Rect = Rect()
 
-    /** 图片右间距 */
-    private var marginRight: Int = 0
+    /** 图片内间距 */
+    private var drawablePadding = Rect()
 
     private var drawableRef: WeakReference<Drawable>? = null
+
+    /** 文字显示区域 */
+    private var textDisplayRect = Rect()
+
+    /** 图片原始间距 */
+    private var drawableOriginPadding = Rect()
 
     override fun getDrawable(): Drawable {
         return drawableRef?.get() ?: super.getDrawable().apply {
@@ -65,17 +74,30 @@ class CenterImageSpan : ImageSpan {
         }
     }
 
-    /** 设置等比例缩放图片, 这会导致[drawableWidth]和[drawableHeight]根据图片原始比例变化 */
+    /** 设置等比例缩放图片 */
     private fun Drawable.setFixedRatioZoom() {
         val ratio = intrinsicWidth.toDouble() / intrinsicHeight
-        drawableWidth = if (drawableWidth > 0) drawableWidth else intrinsicWidth
-        drawableHeight = if (drawableHeight > 0) drawableHeight else intrinsicHeight
-        if (intrinsicWidth > intrinsicHeight) {
-            drawableHeight = (drawableWidth / ratio).toInt()
-        } else if (intrinsicWidth < intrinsicHeight) {
-            drawableWidth = (drawableHeight * ratio).toInt()
+        var width = when {
+            drawableWidth > 0 -> drawableWidth
+            drawableWidth == -1 -> textDisplayRect.width()
+            else -> intrinsicWidth
         }
-        setBounds(0, 0, drawableWidth, drawableHeight)
+        var height = when {
+            drawableHeight > 0 -> drawableHeight
+            drawableHeight == -1 -> textDisplayRect.height()
+            else -> intrinsicHeight
+        }
+
+        if (drawableWidth != -1 && intrinsicWidth > intrinsicHeight) {
+            height = (width / ratio).toInt()
+        } else if (drawableHeight != -1 && intrinsicWidth < intrinsicHeight) {
+            width = (height * ratio).toInt()
+        }
+
+        getPadding(drawableOriginPadding)
+        width += drawablePadding.left + drawablePadding.right + drawableOriginPadding.left + drawableOriginPadding.right
+        height += drawablePadding.top + drawablePadding.bottom + drawableOriginPadding.top + drawableOriginPadding.bottom
+        bounds.set(0, 0, width, height)
     }
 
     constructor(drawable: Drawable) : super(drawable)
@@ -91,29 +113,39 @@ class CenterImageSpan : ImageSpan {
         end: Int,
         fm: Paint.FontMetricsInt?
     ): Int {
+        val fontMetrics = paint.fontMetricsInt
+        if (textSize > 0) {
+            paint.textSize = textSize.toFloat()
+        }
+        if (drawableWidth == -1 || drawableHeight == -1) {
+            val r = Rect()
+            paint.getTextBounds(text.toString(), start, end, r)
+            val resizeFontMetrics = paint.fontMetricsInt
+            textDisplayRect.set(0, 0, r.width(), resizeFontMetrics.descent - resizeFontMetrics.ascent)
+        }
         val bounds = drawable.bounds
+        val imageHeight = bounds.height()
         if (fm != null) {
-            val fontMetricsInt = paint.fontMetricsInt
-            val fontHeight = fontMetricsInt.descent - fontMetricsInt.ascent
-            val imageHeight = bounds.height()
             when (align) {
                 Align.CENTER -> {
-                    fm.ascent = fontMetricsInt.ascent - ((imageHeight - fontHeight) / 2.0f).toInt()
-                    fm.descent = fm.ascent + imageHeight
+                    val fontHeight = fontMetrics.descent - fontMetrics.ascent
+                    fm.ascent = fontMetrics.ascent - (imageHeight - fontHeight) / 2 - drawableMargin.top
+                    fm.descent = fm.ascent + imageHeight + drawableMargin.bottom
                 }
                 Align.BASELINE -> {
-                    fm.ascent = -bounds.bottom
+                    fm.ascent = fontMetrics.descent - imageHeight - fontMetrics.descent - drawableMargin.top - drawableMargin.bottom
                     fm.descent = 0
                 }
                 Align.BOTTOM -> {
-                    fm.ascent = -bounds.bottom + fm.descent
+                    fm.ascent = fontMetrics.descent - imageHeight - drawableMargin.top - drawableMargin.bottom
                     fm.descent = 0
                 }
             }
+
             fm.top = fm.ascent
             fm.bottom = fm.descent
         }
-        return bounds.right + marginLeft + marginRight
+        return bounds.right + drawableMargin.left + drawableMargin.right
     }
 
     override fun draw(
@@ -128,18 +160,19 @@ class CenterImageSpan : ImageSpan {
         paint: Paint
     ) {
         canvas.save()
+        val drawable = drawable
         val bounds = drawable.bounds
-        var transY = bottom - bounds.bottom
-        if (align == Align.BASELINE) {
-            transY -= paint.fontMetricsInt.descent
-        } else if (align == Align.CENTER) {
-            transY -= (bottom - top) / 2 - (bounds.bottom - bounds.top) / 2
+        val transY = when (align) {
+            Align.CENTER -> bottom - bounds.bottom - (bottom - top) / 2 + bounds.height() / 2 - drawableMargin.height() / 2
+            Align.BASELINE -> top - drawableMargin.bottom
+            Align.BOTTOM -> top - drawableMargin.bottom
         }
-        canvas.translate(x + marginLeft, transY.toFloat())
+        canvas.translate(x + drawableMargin.left, transY.toFloat())
         drawable.draw(canvas)
 
         // draw text
         if (textVisibility) {
+            canvas.translate(-drawablePadding.width() / 2F - drawableOriginPadding.right, -drawablePadding.height() / 2F + drawableOriginPadding.top)
             val textWidth = paint.measureText(text, start, end)
             val textDrawRect = Rect()
             val textContainerRect = Rect(bounds)
@@ -156,10 +189,11 @@ class CenterImageSpan : ImageSpan {
                     paint.color = it.foregroundColor
                 }
             }
+
             canvas.drawText(
                 text, start, end,
-                (textDrawRect.left + textOffsetRect.left - textOffsetRect.right).toFloat(),
-                (textDrawRect.bottom - (paint.fontMetricsInt.descent / 2) + textOffsetRect.top - textOffsetRect.bottom).toFloat(),
+                (textDrawRect.left + textOffset.left - textOffset.right).toFloat() + (drawableOriginPadding.right + drawableOriginPadding.left) / 2,
+                (textDrawRect.bottom - paint.fontMetricsInt.descent / 2 + textOffset.top - textOffset.bottom).toFloat() - (drawableOriginPadding.bottom + drawableOriginPadding.top) / 2,
                 paint
             )
         }
@@ -187,6 +221,8 @@ class CenterImageSpan : ImageSpan {
     /**
      * 设置图片宽高
      * 如果参数值为0则表示使用图片原始宽高, 无论宽高值如何图片都将会按照固定比例缩放, 你无需但需错误值导致图片拉伸变形
+     * @param  width 指定图片宽度, -1 表示根据文字宽度自动设置图片宽度
+     * @param  height 指定图片高度, -1 表示根据文字高度自动设置图片宽度
      */
     @JvmOverloads
     fun setDrawableSize(width: Int, height: Int = width) = apply {
@@ -198,16 +234,43 @@ class CenterImageSpan : ImageSpan {
     /** 设置图片水平间距 */
     @JvmOverloads
     fun setMarginHorizontal(left: Int, right: Int = left) = apply {
-        this.marginLeft = left
-        this.marginRight = right
+        drawableMargin.left = left
+        drawableMargin.right = right
+    }
+
+    /** 设置图片水平间距 */
+    @JvmOverloads
+    fun setMarginVertical(top: Int, bottom: Int = top) = apply {
+        drawableMargin.top = top
+        drawableMargin.bottom = bottom
+    }
+
+    /**
+     * 设置图片水平内间距
+     */
+    @JvmOverloads
+    fun setPaddingHorizontal(left: Int, right: Int = left) = apply {
+        drawablePadding.left = left
+        drawablePadding.right = right
+        drawableRef?.clear()
+    }
+
+    /**
+     * 设置图片垂直内间距
+     */
+    @JvmOverloads
+    fun setPaddingVertical(top: Int, bottom: Int = top) = apply {
+        drawablePadding.top = top
+        drawablePadding.bottom = bottom
         drawableRef?.clear()
     }
     //</editor-fold>
 
     //<editor-fold desc="Text">
-    private var textOffsetRect = Rect()
+    private var textOffset = Rect()
     private var textGravity = Gravity.CENTER
     private var textVisibility = false
+    private var textSize = 0
 
     /**
      * 当前为背景图片, 这会导致显示文字内容, 但图片不会根据文字内容自动调整
@@ -223,7 +286,7 @@ class CenterImageSpan : ImageSpan {
      */
     @JvmOverloads
     fun setTextOffset(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0) = apply {
-        textOffsetRect.set(left, top, right, bottom)
+        textOffset.set(left, top, right, bottom)
     }
 
     /**
@@ -231,7 +294,16 @@ class CenterImageSpan : ImageSpan {
      * @param gravity 值等效于[android.widget.TextView.setGravity], 例如[Gravity.BOTTOM], 使用[or]组合多个值
      */
     fun setTextGravity(gravity: Int) = apply {
-        this.textGravity = gravity
+        textGravity = gravity
+    }
+
+    /**
+     * 配合[AbsoluteSizeSpan]设置字体大小则图片/文字会基线对齐, 而使用本方法则图片/文字会居中对齐
+     * @param size 文字大小, 单位px
+     * @see setTextVisibility
+     */
+    fun setTextSize(size: Int) = apply {
+        textSize = size
     }
     //</editor-fold>
 

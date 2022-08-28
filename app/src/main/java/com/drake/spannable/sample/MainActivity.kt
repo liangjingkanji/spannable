@@ -100,7 +100,40 @@ class MainActivity : BaseMenuActivity() {
 
         // GIF图文混排
         binding.tv7.text = "播放GIF动画[晕]表情".replaceSpan("[晕]") {
-            GlideImageSpan(binding.tv7, R.drawable.ic_gif).setDrawableSize(50.dp)
+            GlideImageSpan(binding.tv7, R.drawable.ic_gif)
+                .setRequestOption(RequestOptions.centerCropTransform())
+                .setDrawableSize(50.dp)
+        }
+
+        binding.tv8.text = "使用shape".addSpan(
+            "自适应标签",
+            listOf(
+                CenterImageSpan(this, R.drawable.bg_label)
+                    .setDrawableSize(-1)
+                    .setPaddingHorizontal(6.dp)
+                    .setTextSize(20.dp) // 区别于AbsoluteSizeSpan是完全居中对齐行
+                    .setTextVisibility(),
+                ColorSpan(Color.WHITE),
+                StyleSpan(Typeface.BOLD)
+            )
+        ).addSpan("构建自适应文字宽高标签")
+
+        binding.tv9.text = "自适应点九图片".setSpan(
+            listOf(
+                CenterImageSpan(this, R.drawable.bg_msg_bubble_left)
+                    .setDrawableSize(-1)
+                    .setTextVisibility(),
+                ColorSpan(Color.BLACK),
+                AbsoluteSizeSpan(24, true),
+                StyleSpan(Typeface.BOLD)
+            )
+        ).addSpan("适用于可伸展PNG")
+
+        binding.tv10.text = "塞尔达公主是任天堂游戏塞尔达传说系列的主要角色。她由宫本茂创造，最早于1986年游戏《塞尔达传说》中登场%s 。 根据宫本茂所述，塞尔达的名字受到美国小说家泽尔达·菲茨杰拉德所影响。宫本茂解释到：“菲茨杰拉德是一个著名的且漂亮的女性，我喜欢她名字读出的声音”。 塞尔达公主几乎都在全部塞尔达传说作品中出现。".replaceSpan("%s") {
+            GlideImageSpan(binding.tv10, R.drawable.ic_zelda)
+                .setRequestOption(RequestOptions.centerCropTransform())
+                .setAlign(GlideImageSpan.Align.BOTTOM)
+                .setDrawableSize(100.dp)
         }
     }
 }
