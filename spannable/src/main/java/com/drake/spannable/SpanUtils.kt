@@ -30,6 +30,7 @@ import androidx.core.text.set
  */
 @JvmOverloads
 fun CharSequence.setSpan(what: Any?, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE): CharSequence {
+    if (what == null) return this
     val str = when (this) {
         is Spannable -> this
         else -> SpannableStringBuilder(this)
