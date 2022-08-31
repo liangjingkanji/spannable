@@ -103,7 +103,8 @@ class MainActivity : BaseMenuActivity() {
             GlideImageSpan(binding.tv7, R.drawable.ic_gif).setDrawableSize(50.dp)
         }
 
-        binding.tv8.text = "image".setSpan(
+        binding.tv8.text = "使用".addSpan(
+            "Shape",
             listOf(
                 CenterImageSpan(this, R.drawable.bg_label)
                     .setDrawableSize(-1)
@@ -113,18 +114,18 @@ class MainActivity : BaseMenuActivity() {
                 AbsoluteSizeSpan(40, true),
                 StyleSpan(Typeface.BOLD)
             )
-        ).addSpan("今天是个好日子")
+        ).addSpan("作为可伸展标签背景")
 
-        binding.tv9.text = "image".setSpan(
+        binding.tv9.text = "自适应点九图片".setSpan(
             listOf(
                 CenterImageSpan(this, R.drawable.bg_msg_bubble_left)
                     .setDrawableSize(-1)
                     .setTextVisibility(),
                 ColorSpan(Color.WHITE),
-                AbsoluteSizeSpan(40, true),
+                AbsoluteSizeSpan(30, true),
                 StyleSpan(Typeface.BOLD)
             )
-        ).addSpan("今天是个好日子")
+        ).addSpan("适用于可伸展PNG")
     }
 }
 

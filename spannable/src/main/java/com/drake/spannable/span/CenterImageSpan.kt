@@ -22,6 +22,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.NinePatchDrawable
 import android.net.Uri
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
@@ -37,6 +38,8 @@ import java.lang.ref.WeakReference
  * 图片宽高且保持固定比例
  * 图片水平间距
  * 图片显示文字
+ * shape自适应文字
+ * .9PNG自适应文字
  *
  * 默认图片垂直居中对齐文字, 使用[setAlign]可指定
  *
@@ -55,6 +58,9 @@ class CenterImageSpan : ImageSpan {
 
     /** 图片右间距 */
     private var marginRight: Int = 0
+
+    /** 文字总高度（包括上下空白区域） */
+    private var paintMetricsHeight = -1
 
     private var drawableRef: WeakReference<Drawable>? = null
 
@@ -81,6 +87,8 @@ class CenterImageSpan : ImageSpan {
         }
         var height = when {
             drawableHeight > 0 -> drawableHeight
+            //点九适配
+            this is NinePatchDrawable -> paintMetricsHeight
             drawableWidth == -1 -> textDisplayRect.height()
             else -> intrinsicHeight
         }
@@ -94,7 +102,6 @@ class CenterImageSpan : ImageSpan {
         getPadding(drawableOriginPadding)
         width += drawablePadding.left + drawablePadding.right + drawableOriginPadding.left + drawableOriginPadding.right
         height += drawablePadding.top + drawablePadding.bottom + drawableOriginPadding.top + drawableOriginPadding.bottom
-
         bounds.set(0, 0, width, height)
     }
 
@@ -114,6 +121,7 @@ class CenterImageSpan : ImageSpan {
         if (drawableWidth == -1 || drawableHeight == -1) {
             paint.getTextBounds(text.toString(), start, end, textDisplayRect)
         }
+        paintMetricsHeight = paint.fontMetricsInt.bottom - paint.fontMetricsInt.top
         val bounds = drawable.bounds
         if (fm != null) {
             val fontMetricsInt = paint.fontMetricsInt
@@ -133,8 +141,9 @@ class CenterImageSpan : ImageSpan {
                     fm.descent = 0
                 }
             }
-            fm.top = fm.ascent
-            fm.bottom = fm.descent
+
+            fm.top = fm.ascent - drawableOriginPadding.top
+            fm.bottom = fm.descent + drawableOriginPadding.bottom
         }
         return bounds.right + marginLeft + marginRight
     }
@@ -184,10 +193,11 @@ class CenterImageSpan : ImageSpan {
                     paint.color = it.foregroundColor
                 }
             }
+
             canvas.drawText(
                 text, start, end,
-                (textDrawRect.left + textOffset.left - textOffset.right).toFloat(),
-                (textDrawRect.bottom - (paint.fontMetricsInt.descent / 2) + textOffset.top - textOffset.bottom).toFloat(),
+                (textDrawRect.left + textOffset.left - textOffset.right).toFloat() + (drawableOriginPadding.right + drawableOriginPadding.left) / 2,
+                (textDrawRect.bottom - (paint.fontMetricsInt.descent / 2) + textOffset.top - textOffset.bottom).toFloat() - (drawableOriginPadding.bottom + drawableOriginPadding.top) / 2,
                 paint
             )
         }
