@@ -19,6 +19,14 @@ apply plugin: "kotlin-android"
 
 android {
     compileSdkVersion 30
+    signingConfigs {
+        signed {
+            storeFile file("../signed")
+            storePassword "s73dfyUxkjuq"
+            keyAlias "key0"
+            keyPassword "s73dfyUxkjuq"
+        }
+    }
     defaultConfig {
         applicationId "com.drake.spannable.sample"
         minSdkVersion 19
@@ -27,6 +35,7 @@ android {
         versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.signed
     }
     buildTypes {
         release {
