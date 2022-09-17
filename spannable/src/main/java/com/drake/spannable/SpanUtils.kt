@@ -82,6 +82,16 @@ fun CharSequence.setSpan(
 /**
  * 添加字符串并添加效果, 同时保留以前文字效果
  * @param text 可以是[android.text.Spanned]或[CharSequence], 空字符则添加无效
+ *
+ * @return 如果接受者不为[SpannableStringBuilder]则将返回一个新的[SpannableStringBuilder]对象
+ */
+infix fun CharSequence.addSpan(text: CharSequence): CharSequence {
+    return addSpan(text, null)
+}
+
+/**
+ * 添加字符串并添加效果, 同时保留以前文字效果
+ * @param text 可以是[android.text.Spanned]或[CharSequence], 空字符则添加无效
  * @param what 文字效果, 如果为数组或者集合则设置多个
  * @param flags 参考 [Spanned.SPAN_EXCLUSIVE_EXCLUSIVE]
  *
@@ -90,7 +100,7 @@ fun CharSequence.setSpan(
 @JvmOverloads
 fun CharSequence.addSpan(
     text: CharSequence,
-    what: Any? = null,
+    what: Any?,
     flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
 ): CharSequence {
     val spannable = when (what) {
