@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-<a href="https://github.com/liangjingkanji/spannable/releases/download/1.1.7/spannale-sample.apk">下载体验</a>
+<a href="https://github.com/liangjingkanji/spannable/releases/download/1.2.0/spannale-sample.apk">下载体验</a>
 </p>
 
 <br>
@@ -50,8 +50,8 @@
 
 | Span | 描述 |
 |-|-|
-| CenterImageSpan | 垂直对齐方式/图片宽高/固定图片比例/显示文字/Shape/.9PNG |
-| GlideImageSpan | 网络图片/GIF动画/垂直对齐方式/图片宽高/固定图片比例/显示文字/Shape/.9PNG, Require [Glide](https://github.com/bumptech/glide) |
+| CenterImageSpan | 垂直对齐方式/图片宽高/固定图片比例/显示文字/自适应文字宽高/Shape/.9图 |
+| GlideImageSpan | 网络图片/GIF动画/垂直对齐方式/图片宽高/固定图片比例/显示文字/自适应文字宽高, Require [Glide](https://github.com/bumptech/glide) |
 | MarginSpan | 文字间距 |
 | ColorSpan | 快速创建文字颜色 |
 | HighlightSpan | 创建字体颜色/字体样式/可点击效果 |
@@ -90,7 +90,7 @@ dependencyResolutionManagement {
 然后在 module 的 build.gradle 添加依赖框架
 
 ```groovy
-implementation 'com.github.liangjingkanji:spannable:1.1.7'
+implementation 'com.github.liangjingkanji:spannable:1.2.0'
 ```
 
 
