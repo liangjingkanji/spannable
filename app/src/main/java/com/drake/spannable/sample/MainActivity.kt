@@ -127,7 +127,7 @@ class MainActivity : BaseMenuActivity() {
                 AbsoluteSizeSpan(24, true),
                 StyleSpan(Typeface.BOLD)
             )
-        ).addSpan("适用于可伸展PNG")
+        ) addSpan "适用于可伸展PNG"
 
         binding.tv10.text = "塞尔达公主是任天堂游戏塞尔达传说系列的主要角色。她由宫本茂创造，最早于1986年游戏《塞尔达传说》中登场%s 。 根据宫本茂所述，塞尔达的名字受到美国小说家泽尔达·菲茨杰拉德所影响。宫本茂解释到：“菲茨杰拉德是一个著名的且漂亮的女性，我喜欢她名字读出的声音”。 塞尔达公主几乎都在全部塞尔达传说作品中出现。".replaceSpan("%s") {
             GlideImageSpan(binding.tv10, R.drawable.ic_zelda)
