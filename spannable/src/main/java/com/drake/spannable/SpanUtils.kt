@@ -81,7 +81,7 @@ fun CharSequence.setSpan(
 
 /**
  * 添加字符串并添加效果, 同时保留以前文字效果
- * @param text 可以是[android.text.Spanned]或[CharSequence], 空字符则添加无效
+ * @param text 可以是[Spanned]或[Spanned]数组/集合或[CharSequence], 空字符则无效
  *
  * @return 如果接受者不为[SpannableStringBuilder]则将返回一个新的[SpannableStringBuilder]对象
  */
@@ -91,7 +91,7 @@ infix fun CharSequence.addSpan(text: CharSequence): CharSequence {
 
 /**
  * 添加字符串并添加效果, 同时保留以前文字效果
- * @param text 可以是[android.text.Spanned]或[CharSequence], 空字符则添加无效
+ * @param text 可以是[Spanned]或[Spanned]数组/集合或[CharSequence], 空字符则无效
  * @param what 文字效果, 如果为数组或者集合则设置多个
  * @param flags 参考 [Spanned.SPAN_EXCLUSIVE_EXCLUSIVE]
  *
@@ -121,7 +121,7 @@ fun CharSequence.addSpan(
 /**
  * 添加字符串到指定位置并添加效果, 同时保留以前文字效果
  * @param where 插入位置
- * @param text 可以是[android.text.Spanned]或[CharSequence], 空字符则添加无效
+ * @param text 可以是[Spanned]或[Spanned]数组/集合或[CharSequence], 空字符则无效
  * @param what 文字效果, 如果为数组或者集合则设置多个
  * @param flags 参考 [Spanned.SPAN_EXCLUSIVE_EXCLUSIVE]
  *
@@ -154,13 +154,13 @@ fun CharSequence.addSpan(
  *
  * @param oldValue 被替换的字符串
  * @param ignoreCase 忽略大小写
- * @param replacement 每次匹配到字符串都会调用此函数
+ * @param replacement 每次匹配到字符串都会调用此函数, 该函数返回值可以是[Spanned]或[Spanned]数组/集合或[CharSequence], 空字符则无效
  * 1. 如果返回null则表示不执行任何操作
  * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
- * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
- * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
+ * 3. 返回[Spanned]可以替换字符串同时添加Span效果.
+ * 4. 返回[CharSequence]则仅仅是替换字符串.
  * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
- * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
+ * 6. 和[replace]函数不同的是本函数会保留原有[Spanned]的效果
  *
  * @return
  * 1. 没有匹配任何项返回[this]
@@ -186,13 +186,13 @@ fun CharSequence.replaceSpan(
  *
  * @param regex 正则
  * @param quoteGroup 是否允许反向引用捕获组
- * @param replacement 每次匹配到字符串都会调用此函数
+ * @param replacement 每次匹配到字符串都会调用此函数, 该函数返回值可以是[Spanned]或[Spanned]数组/集合或[CharSequence], 空字符则无效
  * 1. 如果返回null则表示不执行任何操作
  * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
- * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
- * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
+ * 3. 返回[Spanned]可以替换字符串同时添加Span效果.
+ * 4. 返回[CharSequence]则仅仅是替换字符串.
  * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
- * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
+ * 6. 和[replace]函数不同的是本函数会保留原有[Spanned]的效果
  *
  * @return
  * 1. 没有匹配任何项返回[this]
@@ -262,13 +262,13 @@ fun CharSequence.replaceSpan(
  *
  * @param oldValue 被替换的字符串
  * @param ignoreCase 忽略大小写
- * @param replacement 每次匹配到字符串都会调用此函数
+ * @param replacement 每次匹配到字符串都会调用此函数, 该函数返回值可以是[Spanned]或[Spanned]数组/集合或[CharSequence], 空字符则无效
  * 1. 如果返回null则表示不执行任何操作
  * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
- * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
- * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
+ * 3. 返回[Spanned]可以替换字符串同时添加Span效果.
+ * 4. 返回[CharSequence]则仅仅是替换字符串.
  * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
- * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
+ * 6. 和[replace]函数不同的是本函数会保留原有[Spanned]的效果
  *
  * @return
  * 1. 没有匹配任何项返回[this]
@@ -294,13 +294,13 @@ fun CharSequence.replaceSpanFirst(
  *
  * @param regex 正则
  * @param quoteGroup 是否允许反向引用捕获组
- * @param replacement 每次匹配到字符串都会调用此函数
+ * @param replacement 每次匹配到字符串都会调用此函数, 该函数返回值可以是[Spanned]或[Spanned]数组/集合或[CharSequence], 空字符则无效
  * 1. 如果返回null则表示不执行任何操作
  * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
- * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
- * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
+ * 3. 返回[Spanned]可以替换字符串同时添加Span效果.
+ * 4. 返回[CharSequence]则仅仅是替换字符串.
  * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
- * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
+ * 6. 和[replace]函数不同的是本函数会保留原有[Spanned]的效果
  *
  * @return
  * 1. 没有匹配任何项返回[this]
@@ -364,13 +364,13 @@ fun CharSequence.replaceSpanFirst(
  *
  * @param oldValue 被替换的字符串
  * @param ignoreCase 忽略大小写
- * @param replacement 每次匹配到字符串都会调用此函数
+ * @param replacement 每次匹配到字符串都会调用此函数, 该函数返回值可以是[Spanned]或[Spanned]数组/集合或[CharSequence], 空字符则无效
  * 1. 如果返回null则表示不执行任何操作
  * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
- * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
- * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
+ * 3. 返回[Spanned]可以替换字符串同时添加Span效果.
+ * 4. 返回[CharSequence]则仅仅是替换字符串.
  * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
- * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
+ * 6. 和[replace]函数不同的是本函数会保留原有[Spanned]的效果
  *
  * @return
  * 1. 没有匹配任何项返回[this]
@@ -396,13 +396,13 @@ fun CharSequence.replaceSpanLast(
  *
  * @param regex 正则
  * @param quoteGroup 是否允许反向引用捕获组
- * @param replacement 每次匹配到字符串都会调用此函数
+ * @param replacement 每次匹配到字符串都会调用此函数, 该函数返回值可以是[Spanned]或[Spanned]数组/集合或[CharSequence], 空字符则无效
  * 1. 如果返回null则表示不执行任何操作
  * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
- * 3. 返回[android.text.Spanned]可以替换字符串同时添加Span效果.
- * 4. 返回[kotlin.CharSequence]则仅仅是替换字符串.
+ * 3. 返回[Spanned]可以替换字符串同时添加Span效果.
+ * 4. 返回[CharSequence]则仅仅是替换字符串.
  * 5. 并且本函数支持反向引用捕获组, 使用方法等同于RegEx: $捕获组索引
- * 6. 和[replace]函数不同的是本函数会保留原有[android.text.Spanned]的效果
+ * 6. 和[replace]函数不同的是本函数会保留原有[Spanned]的效果
  *
  * @return
  * 1. 没有匹配任何项返回[this]
