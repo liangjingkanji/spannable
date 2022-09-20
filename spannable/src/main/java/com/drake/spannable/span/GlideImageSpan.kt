@@ -29,6 +29,7 @@ import android.widget.TextView
 import androidx.core.text.getSpans
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.bumptech.glide.request.Request
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -78,8 +79,11 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
     /** 初始固定图片显示区域, 优先级: 自定义尺寸 > 占位图尺寸 > 文字尺寸 */
     private var fixDrawableBounds = Rect()
 
+    private var request: Request? = null
+
     fun getDrawable(): Drawable? {
-        if (drawableRef.get() == null) {
+        val request = request
+        if (drawableRef.get() == null && (request == null || request.isComplete)) {
             val placeHolder = try {
                 requestOption.placeholderDrawable ?: view.context.resources.getDrawable(
                     requestOption.placeholderId
@@ -108,8 +112,7 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
             if (height != placeHolder?.intrinsicHeight) {
                 height += drawablePadding.top + drawablePadding.bottom + drawableOriginPadding.top + drawableOriginPadding.bottom
             }
-
-            Glide.with(view.context).load(url).apply(requestOption).into(object : CustomTarget<Drawable>(width, height) {
+            this.request = Glide.with(view).load(url).apply(requestOption).into(object : CustomTarget<Drawable>(width, height) {
                 override fun onResourceReady(
                     resource: Drawable,
                     transition: Transition<in Drawable>?
@@ -141,7 +144,7 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
 
                 override fun onLoadCleared(placeholder: Drawable?) {
                 }
-            })
+            }).request
         }
         return drawableRef.get()
     }
