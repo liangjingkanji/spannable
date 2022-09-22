@@ -111,7 +111,7 @@ class MainActivity : BaseMenuActivity() {
                 CenterImageSpan(this, R.drawable.bg_label)
                     .setDrawableSize(-1)
                     .setPaddingHorizontal(6.dp)
-                    .setTextSize(20.dp) // 区别于AbsoluteSizeSpan是完全居中对齐行
+                    .setTextSize(16.dp) // 区别于AbsoluteSizeSpan是完全居中对齐行
                     .setTextVisibility(),
                 ColorSpan(Color.WHITE),
                 StyleSpan(Typeface.BOLD)
@@ -120,11 +120,11 @@ class MainActivity : BaseMenuActivity() {
 
         binding.tv9.text = "自适应点九图片".setSpan(
             listOf(
-                CenterImageSpan(this, R.drawable.bg_msg_bubble_left)
+                CenterImageSpan(this, R.drawable.bg_date_label)
                     .setDrawableSize(-1)
                     .setTextVisibility(),
                 ColorSpan(Color.BLACK),
-                AbsoluteSizeSpan(24, true),
+                AbsoluteSizeSpan(16, true),
                 StyleSpan(Typeface.BOLD)
             )
         ) addSpan "适用于可伸展PNG"
