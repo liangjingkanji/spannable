@@ -22,6 +22,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.NinePatchDrawable
 import android.net.Uri
 import android.text.Spanned
 import android.text.style.AbsoluteSizeSpan
@@ -30,6 +31,7 @@ import android.text.style.ImageSpan
 import android.view.Gravity
 import androidx.core.text.getSpans
 import java.lang.ref.WeakReference
+import kotlin.math.max
 
 /**
  * 比官方[ImageSpan]更好用的图片显示Span
@@ -39,7 +41,7 @@ import java.lang.ref.WeakReference
  * 图片水平间距
  * 图片显示文字
  * shape自适应文字
- * .9PNG自适应文字
+ * .9PNG自适应文字(如图片模糊请关闭硬件加速)
  *
  * 默认图片垂直居中对齐文字, 使用[setAlign]可指定
  *
@@ -97,6 +99,11 @@ class CenterImageSpan : ImageSpan {
         getPadding(drawableOriginPadding)
         width += drawablePadding.left + drawablePadding.right + drawableOriginPadding.left + drawableOriginPadding.right
         height += drawablePadding.top + drawablePadding.bottom + drawableOriginPadding.top + drawableOriginPadding.bottom
+
+        if (this is NinePatchDrawable) {
+            width = max(width, intrinsicWidth)
+            height = max(height, intrinsicHeight)
+        }
         bounds.set(0, 0, width, height)
     }
 

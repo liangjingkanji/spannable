@@ -20,6 +20,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.NinePatchDrawable
 import android.text.Spanned
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
@@ -34,6 +35,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.math.max
 
 /**
  * 使用Glide加载图片资源, 请先依赖[Glide](https://github.com/bumptech/glide)
@@ -165,6 +167,11 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
         getPadding(drawableOriginPadding)
         width += drawablePadding.left + drawablePadding.right + drawableOriginPadding.left + drawableOriginPadding.right
         height += drawablePadding.top + drawablePadding.bottom + drawableOriginPadding.top + drawableOriginPadding.bottom
+
+        if (this is NinePatchDrawable) {
+            width = max(width, intrinsicWidth)
+            height = max(height, intrinsicHeight)
+        }
         bounds.set(0, 0, width, height)
     }
 
