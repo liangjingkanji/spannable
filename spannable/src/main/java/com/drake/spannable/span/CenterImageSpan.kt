@@ -29,6 +29,7 @@ import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
 import android.view.Gravity
+import android.widget.TextView
 import androidx.core.text.getSpans
 import java.lang.ref.WeakReference
 import kotlin.math.max
@@ -41,11 +42,11 @@ import kotlin.math.max
  * 图片水平间距
  * 图片显示文字
  * shape自适应文字
- * .9PNG自适应文字(如图片模糊请关闭硬件加速)
+ * .9PNG自适应文字, 若图片模糊请关闭硬件加速(机型设备问题)
  *
  * 默认图片垂直居中对齐文字, 使用[setAlign]可指定
  *
- * 需应对更复杂的图片加载需求请使用[GlideImageSpan]
+ * 需应对更复杂的图片加载需求请使用[GlideImageSpan], 例如高斯模糊,棱形等效果
  */
 class CenterImageSpan : ImageSpan {
 
@@ -227,9 +228,9 @@ class CenterImageSpan : ImageSpan {
 
     /**
      * 设置图片宽高
-     * 如果参数值为0则表示使用图片原始宽高, 无论宽高值如何图片都将会按照固定比例缩放, 你无需但需错误值导致图片拉伸变形
-     * @param  width 指定图片宽度, -1 表示根据文字宽度自动设置图片宽度
-     * @param  height 指定图片高度, -1 表示根据文字高度自动设置图片宽度
+     * 如果指定大于零值则会基于图片宽高中最大值然后根据宽高比例固定缩放图片
+     * @param  width 指定图片宽度, -1 使用文字宽度, 0 使用图片原始宽度
+     * @param  height 指定图片高度, -1 使用文字高度, 0 使用图片原始高度
      */
     @JvmOverloads
     fun setDrawableSize(width: Int, height: Int = width) = apply {
@@ -298,7 +299,7 @@ class CenterImageSpan : ImageSpan {
 
     /**
      * 文字对齐方式(基于图片), 默认对齐方式[Gravity.CENTER]
-     * @param gravity 值等效于[android.widget.TextView.setGravity], 例如[Gravity.BOTTOM], 使用[or]组合多个值
+     * @param gravity 值等效于[TextView.setGravity], 例如[Gravity.BOTTOM], 使用[or]组合多个值
      */
     fun setTextGravity(gravity: Int) = apply {
         textGravity = gravity

@@ -325,9 +325,9 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
 
     /**
      * 设置图片宽高
-     * 如果参数值为0则表示使用图片原始宽高, 无论宽高值如何图片都将会按照固定比例缩放, 你无需但需错误值导致图片拉伸变形
-     * @param  width 指定图片宽度, -1 表示根据文字宽度自动设置图片宽度
-     * @param  height 指定图片高度, -1 表示根据文字高度自动设置图片宽度
+     * 如果指定大于零值则会基于图片宽高中最大值然后根据宽高比例固定缩放图片
+     * @param  width 指定图片宽度, -1 使用文字宽度, 0 使用图片原始宽度
+     * @param  height 指定图片高度, -1 使用文字高度, 0 使用图片原始高度
      */
     @JvmOverloads
     fun setDrawableSize(width: Int, height: Int = width) = apply {
@@ -411,7 +411,7 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
 
     /**
      * 文字对齐方式(基于图片), 默认对齐方式[Gravity.CENTER]
-     * @param gravity 值等效于[android.widget.TextView.setGravity], 例如[Gravity.BOTTOM], 使用[or]组合多个值
+     * @param gravity 值等效于[TextView.setGravity], 例如[Gravity.BOTTOM], 使用[or]组合多个值
      */
     fun setTextGravity(gravity: Int) = apply {
         this.textGravity = gravity
