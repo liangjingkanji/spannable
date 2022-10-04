@@ -83,38 +83,24 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
 
     private var request: Request? = null
 
-    fun getDrawable(): Drawable? {
+    /** 占位图 */
+    private val placeHolder: Drawable? by lazy {
+        val placeHolder = try {
+            requestOption.placeholderDrawable ?: view.context.resources.getDrawable(
+                requestOption.placeholderId
+            )
+        } catch (e: Exception) {
+            null
+        }
+        placeHolder?.setFixedRatioZoom()
+        placeHolder
+    }
+
+    private fun getDrawable(): Drawable? {
         val request = request
         if (drawableRef.get() == null && (request == null || request.isComplete)) {
-            val placeHolder = try {
-                requestOption.placeholderDrawable ?: view.context.resources.getDrawable(
-                    requestOption.placeholderId
-                )
-            } catch (e: Exception) {
-                null
-            }
-            placeHolder?.setFixedRatioZoom()
-
-            var width = when {
-                drawableWidth > 0 -> drawableWidth
-                drawableWidth == -1 -> textDisplayRect.width()
-                placeHolder != null -> placeHolder.intrinsicWidth
-                else -> textDisplayRect.width()
-            }
-            var height = when {
-                drawableHeight > 0 -> drawableHeight
-                drawableHeight == -1 -> textDisplayRect.height()
-                placeHolder != null -> placeHolder.intrinsicHeight
-                else -> textDisplayRect.height()
-            }
-
-            if (width != placeHolder?.intrinsicWidth) {
-                width += drawablePadding.left + drawablePadding.right + drawableOriginPadding.left + drawableOriginPadding.right
-            }
-            if (height != placeHolder?.intrinsicHeight) {
-                height += drawablePadding.top + drawablePadding.bottom + drawableOriginPadding.top + drawableOriginPadding.bottom
-            }
-            this.request = Glide.with(view).load(url).apply(requestOption).into(object : CustomTarget<Drawable>(width, height) {
+            val drawableSize = getDrawableSize()
+            this.request = Glide.with(view).load(url).apply(requestOption).into(object : CustomTarget<Drawable>(drawableSize.width(), drawableSize.height()) {
                 override fun onResourceReady(
                     resource: Drawable,
                     transition: Transition<in Drawable>?
@@ -123,6 +109,9 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
                         resource.callback = drawableCallback
                         resource.setLoopCount(loopCount)
                         resource.start()
+                    }
+                    if (fixDrawableBounds.isEmpty) {
+                        fixDrawableBounds = getDrawableSize()
                     }
                     resource.bounds = fixDrawableBounds
                     drawableRef.set(resource)
@@ -193,7 +182,7 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
             textDisplayRect.set(0, 0, r.width(), resizeFontMetrics.descent - resizeFontMetrics.ascent)
         }
         val drawable = getDrawable()
-        val bounds = drawable?.bounds ?: getDefaultDisplayRect()
+        val bounds = drawable?.bounds ?: getDrawableSize()
         fixDrawableBounds = bounds
         val imageHeight = bounds.height()
         if (fm != null) {
@@ -233,7 +222,7 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
     ) {
         val drawable = getDrawable()
         canvas.save()
-        val bounds = drawable?.bounds ?: getDefaultDisplayRect()
+        val bounds = drawable?.bounds ?: getDrawableSize()
         val transY = when (align) {
             Align.CENTER -> bottom - bounds.bottom - (bottom - top) / 2 + bounds.height() / 2 - drawableMargin.height() / 2
             Align.BASELINE -> bottom - bounds.bottom - paint.fontMetricsInt.descent - drawableMargin.bottom
@@ -275,17 +264,26 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
      * 默认显示区域
      * 优先使用自定义尺寸, 如果没用配置则使用文字显示区域
      */
-    private fun getDefaultDisplayRect(): Rect {
+    private fun getDrawableSize(): Rect {
+        val placeHolder = placeHolder
         var width = when {
             drawableWidth > 0 -> drawableWidth
+            drawableWidth == -1 -> textDisplayRect.width()
+            placeHolder != null -> placeHolder.intrinsicWidth
             else -> textDisplayRect.width()
         }
         var height = when {
             drawableHeight > 0 -> drawableHeight
+            drawableHeight == -1 -> textDisplayRect.height()
+            placeHolder != null -> placeHolder.intrinsicHeight
             else -> textDisplayRect.height()
         }
-        width += drawablePadding.left + drawablePadding.right + drawableOriginPadding.left + drawableOriginPadding.right
-        height += drawablePadding.top + drawablePadding.bottom + drawableOriginPadding.top + drawableOriginPadding.bottom
+        if (width != placeHolder?.intrinsicWidth) {
+            width += drawablePadding.left + drawablePadding.right + drawableOriginPadding.left + drawableOriginPadding.right
+        }
+        if (height != placeHolder?.intrinsicHeight) {
+            height += drawablePadding.top + drawablePadding.bottom + drawableOriginPadding.top + drawableOriginPadding.bottom
+        }
         return Rect(0, 0, width, height)
     }
 
