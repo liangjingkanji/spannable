@@ -31,13 +31,13 @@ class RichInputActivity : BaseMenuActivity() {
 
     private val binding by lazy { ActivityRichInputBinding.inflate(layoutInflater) }
 
-    // 匹配规则
-    private val matchRules = mapOf(
-        "@[^@]+?(?=\\s|\$)".toRegex() to HighlightSpan("#ed6a2c"),
-        "#[^@]+?(?=\\s|\$)".toRegex() to HighlightSpan("#4a70d2", Typeface.defaultFromStyle(Typeface.BOLD)),
-        "蚂蚁".toRegex() to CenterImageSpan(this, R.drawable.ic_ant).setDrawableSize(50.dp),
-        "生气|angry".toRegex() to CenterImageSpan(this, R.drawable.ic_angry).setDrawableSize(50.dp),
-        "开心|happy".toRegex() to CenterImageSpan(this, R.drawable.ic_happy).setDrawableSize(50.dp)
+    // 匹配规则, 因为同一个Span对象重复设置仅最后一个有效故每次都得创建新的对象
+    private val matchRules = mapOf<Regex, (MatchResult) -> Any?>(
+        "@[^@]+?(?=\\s|\$)".toRegex() to { HighlightSpan("#ed6a2c") },
+        "#[^@]+?(?=\\s|\$)".toRegex() to { HighlightSpan("#4a70d2", Typeface.defaultFromStyle(Typeface.BOLD)) },
+        "蚂蚁".toRegex() to { CenterImageSpan(this, R.drawable.ic_ant).setDrawableSize(50.dp) },
+        "生气|angry".toRegex() to { CenterImageSpan(this, R.drawable.ic_angry).setDrawableSize(50.dp) },
+        "开心|happy".toRegex() to { CenterImageSpan(this, R.drawable.ic_happy).setDrawableSize(50.dp) }
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,9 +48,7 @@ class RichInputActivity : BaseMenuActivity() {
         binding.etInput.addTextChangedListener(object : ModifyTextWatcher() {
             override fun onModify(s: Editable) {
                 matchRules.forEach { rule ->
-                    s.replaceSpan(rule.key) {
-                        rule.value
-                    }
+                    s.replaceSpan(rule.key, replacement = rule.value)
                 }
             }
         })
