@@ -20,6 +20,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.text.Editable
 import com.drake.engine.utils.dp
+import com.drake.spannable.factory.ImageEditableFactory
 import com.drake.spannable.listener.ModifyTextWatcher
 import com.drake.spannable.replaceSpan
 import com.drake.spannable.sample.base.BaseMenuActivity
@@ -34,10 +35,25 @@ class RichInputActivity : BaseMenuActivity() {
     // 匹配规则, 因为同一个Span对象重复设置仅最后一个有效故每次都得创建新的对象
     private val matchRules = mapOf<Regex, (MatchResult) -> Any?>(
         "@[^@]+?(?=\\s|\$)".toRegex() to { HighlightSpan("#ed6a2c") },
-        "#[^@]+?(?=\\s|\$)".toRegex() to { HighlightSpan("#4a70d2", Typeface.defaultFromStyle(Typeface.BOLD)) },
+        "#[^@]+?(?=\\s|\$)".toRegex() to {
+            HighlightSpan(
+                "#4a70d2",
+                Typeface.defaultFromStyle(Typeface.BOLD)
+            )
+        },
         "蚂蚁".toRegex() to { CenterImageSpan(this, R.drawable.ic_ant).setDrawableSize(50.dp) },
-        "生气|angry".toRegex() to { CenterImageSpan(this, R.drawable.ic_angry).setDrawableSize(50.dp) },
-        "开心|happy".toRegex() to { CenterImageSpan(this, R.drawable.ic_happy).setDrawableSize(50.dp) }
+        "生气|angry".toRegex() to {
+            CenterImageSpan(
+                this,
+                R.drawable.ic_angry
+            ).setDrawableSize(50.dp)
+        },
+        "开心|happy".toRegex() to {
+            CenterImageSpan(
+                this,
+                R.drawable.ic_happy
+            ).setDrawableSize(50.dp)
+        }
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,12 +61,15 @@ class RichInputActivity : BaseMenuActivity() {
         setContentView(binding.root)
 
         // 包含 @用户 #标签 表情包 等自动替换规则
-        binding.etInput.addTextChangedListener(object : ModifyTextWatcher() {
-            override fun onModify(s: Editable) {
-                matchRules.forEach { rule ->
-                    s.replaceSpan(rule.key, replacement = rule.value)
+        with(binding) {
+            etInput.setEditableFactory(ImageEditableFactory.instance)
+            etInput.addTextChangedListener(object : ModifyTextWatcher() {
+                override fun onModify(s: Editable) {
+                    matchRules.forEach { rule ->
+                        s.replaceSpan(rule.key, replacement = rule.value)
+                    }
                 }
-            }
-        })
+            })
+        }
     }
 }

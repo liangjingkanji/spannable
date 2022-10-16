@@ -250,7 +250,7 @@ fun CharSequence.replaceSpan(
                     (spanBuilder as SpannableStringBuilder).replace(range.first + offset, range.first + offset + matchLength, adjustReplacement)
                     offset += adjustReplacement.length - matchLength
                 }
-                else -> spanBuilder[range.first, range.last + 1] = spanned
+                else -> spanBuilder.setSpan(spanned,range.first, range.last + 1)
             }
         }
     }
