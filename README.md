@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-<a href="https://github.com/liangjingkanji/spannable/releases/download/1.2.3/spannale-sample.apk">下载体验</a>
+<a href="https://github.com/liangjingkanji/spannable/releases/download/1.2.4/spannale-sample.apk">下载体验</a>
 </p>
 
 <br>
@@ -33,6 +33,7 @@
 - [x] 没有自定义控件/没有多余函数
 - [x] 快速实现图文混排/富文本/自定义表情包
 - [x] 输入框富文本/表情包
+- [x] 可监听剪贴板粘贴/手动输入文本渲染
 
 ## 函数
 
@@ -90,7 +91,7 @@ dependencyResolutionManagement {
 然后在 module 的 build.gradle 添加依赖框架
 
 ```groovy
-implementation 'com.github.liangjingkanji:spannable:1.2.3'
+implementation 'com.github.liangjingkanji:spannable:1.2.4'
 ```
 
 
