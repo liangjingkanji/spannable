@@ -19,7 +19,6 @@ package com.drake.spannable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
-import androidx.core.text.set
 
 /**
  * 设置Span文字效果
@@ -30,21 +29,7 @@ import androidx.core.text.set
  */
 @JvmOverloads
 fun CharSequence.setSpan(what: Any?, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE): CharSequence {
-    if (what == null) return this
-    val str = when (this) {
-        is Spannable -> this
-        else -> SpannableStringBuilder(this)
-    }
-    when (what) {
-        is Array<*> -> what.forEach {
-            str.apply { setSpan(it, 0, length, flags) }
-        }
-        is List<*> -> what.forEach {
-            str.apply { setSpan(it, 0, length, flags) }
-        }
-        else -> str.apply { setSpan(what, 0, length, flags) }
-    }
-    return str
+    return setSpan(what, 0, length, flags)
 }
 
 /**
@@ -63,18 +48,47 @@ fun CharSequence.setSpan(
     end: Int,
     flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
 ): CharSequence {
+    if (what == null) return this
     val str = when (this) {
         is Spannable -> this
         else -> SpannableStringBuilder(this)
     }
     when (what) {
         is Array<*> -> what.forEach {
-            str.apply { setSpan(it, start, end, flags) }
+            if (it == null) return@forEach
+            val existSpan = str.getSpans(start, end, it::class.java).getOrNull(0)
+            if (existSpan == null) {
+                str.setSpan(it, start, end, flags)
+            } else {
+                if (str.getSpanStart(existSpan) != start || str.getSpanEnd(existSpan) != end) {
+                    str.removeSpan(existSpan)
+                    str.setSpan(it, start, end, flags)
+                }
+            }
         }
         is List<*> -> what.forEach {
-            str.apply { setSpan(it, start, end, flags) }
+            if (it == null) return@forEach
+            val existSpan = str.getSpans(start, end, it::class.java).getOrNull(0)
+            if (existSpan == null) {
+                str.setSpan(it, start, end, flags)
+            } else {
+                if (str.getSpanStart(existSpan) != start || str.getSpanEnd(existSpan) != end) {
+                    str.removeSpan(existSpan)
+                    str.setSpan(it, start, end, flags)
+                }
+            }
         }
-        else -> str.apply { setSpan(what, start, end, flags) }
+        else -> {
+            val existSpan = str.getSpans(start, end, what::class.java).getOrNull(0)
+            if (existSpan == null) {
+                str.setSpan(what, start, end, flags)
+            } else {
+                if (str.getSpanStart(existSpan) != start || str.getSpanEnd(existSpan) != end) {
+                    str.removeSpan(existSpan)
+                    str.setSpan(what, start, end, flags)
+                }
+            }
+        }
     }
     return str
 }
@@ -99,9 +113,7 @@ infix fun CharSequence.addSpan(text: CharSequence): CharSequence {
  */
 @JvmOverloads
 fun CharSequence.addSpan(
-    text: CharSequence,
-    what: Any?,
-    flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+    text: CharSequence, what: Any?, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
 ): CharSequence {
     val spannable = when (what) {
         is Array<*> -> what.fold(text) { s, span ->
@@ -129,10 +141,7 @@ fun CharSequence.addSpan(
  */
 @JvmOverloads
 fun CharSequence.addSpan(
-    where: Int,
-    text: CharSequence,
-    what: Any? = null,
-    flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+    where: Int, text: CharSequence, what: Any? = null, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
 ): CharSequence {
     val spannable = when (what) {
         is Array<*> -> what.fold(text) { s, span ->
@@ -169,9 +178,7 @@ fun CharSequence.addSpan(
  */
 @JvmOverloads
 fun CharSequence.replaceSpan(
-    oldValue: String,
-    ignoreCase: Boolean = false,
-    replacement: (MatchResult) -> Any?
+    oldValue: String, ignoreCase: Boolean = false, replacement: (MatchResult) -> Any?
 ): CharSequence {
     val regex = if (ignoreCase) {
         Regex.escape(oldValue).toRegex(RegexOption.IGNORE_CASE)
@@ -201,9 +208,7 @@ fun CharSequence.replaceSpan(
  */
 @JvmOverloads
 fun CharSequence.replaceSpan(
-    regex: Regex,
-    quoteGroup: Boolean = false,
-    replacement: (MatchResult) -> Any?
+    regex: Regex, quoteGroup: Boolean = false, replacement: (MatchResult) -> Any?
 ): CharSequence {
     val sequence = regex.findAll(this)
     val count = sequence.count()
@@ -215,10 +220,10 @@ fun CharSequence.replaceSpan(
         replacement(matchResult)?.let { spanned ->
             when (spanned) {
                 is List<*> -> for (item in spanned) {
-                    spanBuilder[range.first, range.last + 1] = item ?: continue
+                    spanBuilder.setSpan(item ?: continue, range.first, range.last + 1)
                 }
                 is Array<*> -> for (item in spanned) {
-                    spanBuilder[range.first, range.last + 1] = item ?: continue
+                    spanBuilder.setSpan(item ?: continue, range.first, range.last + 1)
                 }
                 is CharSequence -> {
                     var adjustReplacement: CharSequence = spanned
@@ -250,7 +255,7 @@ fun CharSequence.replaceSpan(
                     (spanBuilder as SpannableStringBuilder).replace(range.first + offset, range.first + offset + matchLength, adjustReplacement)
                     offset += adjustReplacement.length - matchLength
                 }
-                else -> spanBuilder[range.first, range.last + 1] = spanned
+                else -> spanBuilder.setSpan(spanned, range.first, range.last + 1)
             }
         }
     }
@@ -277,9 +282,7 @@ fun CharSequence.replaceSpan(
  */
 @JvmOverloads
 fun CharSequence.replaceSpanFirst(
-    oldValue: String,
-    ignoreCase: Boolean = false,
-    replacement: (MatchResult) -> Any?
+    oldValue: String, ignoreCase: Boolean = false, replacement: (MatchResult) -> Any?
 ): CharSequence {
     val regex = if (ignoreCase) {
         Regex.escape(oldValue).toRegex(RegexOption.IGNORE_CASE)
@@ -309,9 +312,7 @@ fun CharSequence.replaceSpanFirst(
  */
 @JvmOverloads
 fun CharSequence.replaceSpanFirst(
-    regex: Regex,
-    quoteGroup: Boolean = false,
-    replacement: (MatchResult) -> Any?
+    regex: Regex, quoteGroup: Boolean = false, replacement: (MatchResult) -> Any?
 ): CharSequence {
     val matchResult = regex.find(this) ?: return this
     var spanBuilder = if (this is Spannable) this else SpannableStringBuilder(this)
@@ -319,10 +320,10 @@ fun CharSequence.replaceSpanFirst(
     replacement(matchResult)?.let { spanned ->
         when (spanned) {
             is List<*> -> for (item in spanned) {
-                spanBuilder[range.first, range.last + 1] = item ?: continue
+                spanBuilder.setSpan(item ?: continue, range.first, range.last + 1)
             }
             is Array<*> -> for (item in spanned) {
-                spanBuilder[range.first, range.last + 1] = item ?: continue
+                spanBuilder.setSpan(item ?: continue, range.first, range.last + 1)
             }
             is CharSequence -> {
                 var adjustReplacement: CharSequence = spanned
@@ -353,7 +354,7 @@ fun CharSequence.replaceSpanFirst(
                 }
                 (spanBuilder as SpannableStringBuilder).replace(range.first, range.first + matchLength, adjustReplacement)
             }
-            else -> spanBuilder[range.first, range.last + 1] = spanned
+            else -> spanBuilder.setSpan(spanned, range.first, range.last + 1)
         }
     }
     return spanBuilder
@@ -379,9 +380,7 @@ fun CharSequence.replaceSpanFirst(
  */
 @JvmOverloads
 fun CharSequence.replaceSpanLast(
-    oldValue: String,
-    ignoreCase: Boolean = false,
-    replacement: (MatchResult) -> Any?
+    oldValue: String, ignoreCase: Boolean = false, replacement: (MatchResult) -> Any?
 ): CharSequence {
     val regex = if (ignoreCase) {
         Regex.escape(oldValue).toRegex(RegexOption.IGNORE_CASE)
@@ -411,9 +410,7 @@ fun CharSequence.replaceSpanLast(
  */
 @JvmOverloads
 fun CharSequence.replaceSpanLast(
-    regex: Regex,
-    quoteGroup: Boolean = false,
-    replacement: (MatchResult) -> Any?
+    regex: Regex, quoteGroup: Boolean = false, replacement: (MatchResult) -> Any?
 ): CharSequence {
     val matchResult = regex.findAll(this).lastOrNull() ?: return this
     var spanBuilder = if (this is Spannable) this else SpannableStringBuilder(this)
@@ -421,10 +418,10 @@ fun CharSequence.replaceSpanLast(
     replacement(matchResult)?.let { spanned ->
         when (spanned) {
             is List<*> -> for (item in spanned) {
-                spanBuilder[range.first, range.last + 1] = item ?: continue
+                spanBuilder.setSpan(item ?: continue, range.first, range.last + 1)
             }
             is Array<*> -> for (item in spanned) {
-                spanBuilder[range.first, range.last + 1] = item ?: continue
+                spanBuilder.setSpan(item ?: continue, range.first, range.last + 1)
             }
             is CharSequence -> {
                 var adjustReplacement: CharSequence = spanned
@@ -455,7 +452,7 @@ fun CharSequence.replaceSpanLast(
                 }
                 (spanBuilder as SpannableStringBuilder).replace(range.first, range.first + matchLength, adjustReplacement)
             }
-            else -> spanBuilder[range.first, range.last + 1] = spanned
+            else -> spanBuilder.setSpan(spanned, range.first, range.last + 1)
         }
     }
     return spanBuilder

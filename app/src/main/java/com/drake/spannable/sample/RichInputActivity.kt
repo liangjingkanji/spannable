@@ -20,6 +20,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.text.Editable
 import com.drake.engine.utils.dp
+import com.drake.spannable.addSpan
 import com.drake.spannable.listener.ModifyTextWatcher
 import com.drake.spannable.replaceSpan
 import com.drake.spannable.sample.base.BaseMenuActivity
@@ -30,6 +31,9 @@ import com.drake.spannable.span.HighlightSpan
 class RichInputActivity : BaseMenuActivity() {
 
     private val binding by lazy { ActivityRichInputBinding.inflate(layoutInflater) }
+
+    private val inputContent // 输入框内容
+        get() = binding.etInput.text
 
     // 匹配规则, 因为同一个Span对象重复设置仅最后一个有效故每次都得创建新的对象
     private val matchRules = mapOf<Regex, (MatchResult) -> Any?>(
@@ -52,5 +56,15 @@ class RichInputActivity : BaseMenuActivity() {
                 }
             }
         })
+
+        // 点击插入表情
+        binding.ivAngry.setOnClickListener {
+            binding.etInput.setText(inputContent addSpan "生气")
+            binding.etInput.setSelection(inputContent.length)
+        }
+        binding.ivHappy.setOnClickListener {
+            binding.etInput.setText(inputContent addSpan "开心")
+            binding.etInput.setSelection(inputContent.length)
+        }
     }
 }
