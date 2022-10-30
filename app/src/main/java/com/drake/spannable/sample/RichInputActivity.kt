@@ -19,6 +19,9 @@ package com.drake.spannable.sample
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.Editable
+import android.view.View
+import android.view.View.OnClickListener
+import android.view.View.OnLongClickListener
 import com.drake.engine.utils.dp
 import com.drake.spannable.addSpan
 import com.drake.spannable.listener.ModifyTextWatcher
@@ -27,8 +30,9 @@ import com.drake.spannable.sample.base.BaseMenuActivity
 import com.drake.spannable.sample.databinding.ActivityRichInputBinding
 import com.drake.spannable.span.CenterImageSpan
 import com.drake.spannable.span.HighlightSpan
+import kotlin.concurrent.thread
 
-class RichInputActivity : BaseMenuActivity() {
+class RichInputActivity : BaseMenuActivity(), OnLongClickListener, OnClickListener {
 
     private val binding by lazy { ActivityRichInputBinding.inflate(layoutInflater) }
 
@@ -58,13 +62,31 @@ class RichInputActivity : BaseMenuActivity() {
         })
 
         // 点击插入表情
-        binding.ivAngry.setOnClickListener {
-            binding.etInput.setText(inputContent addSpan "生气")
-            binding.etInput.setSelection(inputContent.length)
+        binding.ivAngry.setOnClickListener(this)
+        binding.ivHappy.setOnClickListener(this)
+
+        // 长按表情连续添加表情(间隔100毫秒)
+        binding.ivAngry.setOnLongClickListener(this)
+        binding.ivHappy.setOnLongClickListener(this)
+    }
+
+    override fun onLongClick(v: View): Boolean {
+        thread {
+            while (v.isPressed) {
+                Thread.sleep(100)
+                runOnUiThread { v.performClick() }
+            }
         }
-        binding.ivHappy.setOnClickListener {
-            binding.etInput.setText(inputContent addSpan "开心")
-            binding.etInput.setSelection(inputContent.length)
+        return true
+    }
+
+    override fun onClick(v: View?) {
+        val faceStr = when (v) {
+            binding.ivAngry -> "生气"
+            binding.ivHappy -> "开心"
+            else -> return
         }
+        binding.etInput.setText(inputContent addSpan faceStr)
+        binding.etInput.setSelection(inputContent.length)
     }
 }
