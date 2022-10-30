@@ -10,13 +10,32 @@
     <EditText
         android:id="@+id/etInput"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="300dp"
         android:gravity="left|bottom" />
 
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="请输入 @用户 #标签 或者 开心 happy 生气 蚂蚁 等词语" />
+        android:layout_height="wrap_content"
+        android:text="支持剪切板粘贴/输入监听/设置文本\n例如 @用户 #标签 或者 开心 happy 生气 蚂蚁 等词语" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp">
+
+        <ImageView
+            android:id="@+id/ivAngry"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_angry" />
+
+        <ImageView
+            android:id="@+id/ivHappy"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_happy" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.appcompat.widget.LinearLayoutCompat>
