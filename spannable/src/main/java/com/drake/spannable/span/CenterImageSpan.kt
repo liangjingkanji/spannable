@@ -121,10 +121,10 @@ class CenterImageSpan : ImageSpan {
         end: Int,
         fm: Paint.FontMetricsInt?
     ): Int {
-        val fontMetrics = paint.fontMetricsInt
         if (textSize > 0) {
             paint.textSize = textSize.toFloat()
         }
+        val fontMetrics = paint.fontMetricsInt
         if (drawableWidth == -1 || drawableHeight == -1) {
             val r = Rect()
             paint.getTextBounds(text.toString(), start, end, r)
@@ -171,7 +171,7 @@ class CenterImageSpan : ImageSpan {
         val drawable = drawable
         val bounds = drawable.bounds
         val transY = when (align) {
-            Align.CENTER -> bottom - bounds.bottom - (bottom - top) / 2 + bounds.height() / 2 - drawableMargin.height() / 2
+            Align.CENTER ->  (2 * y + paint.fontMetricsInt.ascent + paint.fontMetricsInt.descent) / 2 - bounds.bottom / 2 - drawableMargin.height() / 2
             Align.BASELINE -> top - drawableMargin.bottom
             Align.BOTTOM -> top - drawableMargin.bottom
         }
