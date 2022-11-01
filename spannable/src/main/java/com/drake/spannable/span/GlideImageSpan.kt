@@ -171,10 +171,10 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
         end: Int,
         fm: Paint.FontMetricsInt?
     ): Int {
-        val fontMetrics = paint.fontMetricsInt
         if (textSize > 0) {
             paint.textSize = textSize.toFloat()
         }
+        val fontMetrics = paint.fontMetricsInt
         if (drawableWidth <= 0 || drawableHeight <= 0) {
             val r = Rect()
             paint.getTextBounds(text.toString(), start, end, r)
@@ -224,7 +224,7 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
         canvas.save()
         val bounds = drawable?.bounds ?: getDrawableSize()
         val transY = when (align) {
-            Align.CENTER -> bottom - bounds.bottom - (bottom - top) / 2 + bounds.height() / 2 - drawableMargin.height() / 2
+            Align.CENTER ->  (2 * y + paint.fontMetricsInt.ascent + paint.fontMetricsInt.descent) / 2 - bounds.bottom / 2 - drawableMargin.height() / 2
             Align.BASELINE -> bottom - bounds.bottom - paint.fontMetricsInt.descent - drawableMargin.bottom
             Align.BOTTOM -> bottom - bounds.bottom - drawableMargin.bottom
         }
