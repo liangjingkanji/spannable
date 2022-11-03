@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-<a href="https://github.com/liangjingkanji/spannable/releases/download/1.2.4/spannale-sample.apk">下载体验</a>
+<a href="https://github.com/liangjingkanji/spannable/releases/download/1.2.5/spannale-sample.apk">下载体验</a>
 </p>
 
 <br>
@@ -91,7 +91,7 @@ dependencyResolutionManagement {
 然后在 module 的 build.gradle 添加依赖框架
 
 ```groovy
-implementation 'com.github.liangjingkanji:spannable:1.2.4'
+implementation 'com.github.liangjingkanji:spannable:1.2.5'
 ```
 
 
