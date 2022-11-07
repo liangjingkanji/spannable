@@ -24,6 +24,7 @@ import android.view.View.OnClickListener
 import android.view.View.OnLongClickListener
 import com.drake.engine.utils.dp
 import com.drake.spannable.addSpan
+import com.drake.spannable.clearSpans
 import com.drake.spannable.listener.ModifyTextWatcher
 import com.drake.spannable.replaceSpan
 import com.drake.spannable.sample.base.BaseMenuActivity
@@ -54,6 +55,12 @@ class RichInputActivity : BaseMenuActivity(), OnLongClickListener, OnClickListen
 
         // 包含 @用户 #标签 表情包 等自动替换规则
         binding.etInput.addTextChangedListener(object : ModifyTextWatcher() {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+                // 替换文本时清除span
+                s.clearSpans<HighlightSpan>()
+                s.clearSpans<CenterImageSpan>()
+            }
+
             override fun onModify(s: Editable) {
                 matchRules.forEach { rule ->
                     s.replaceSpan(rule.key, replacement = rule.value)

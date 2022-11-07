@@ -19,6 +19,7 @@ package com.drake.spannable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
+import androidx.core.text.getSpans
 
 /**
  * 设置Span文字效果
@@ -456,4 +457,19 @@ fun CharSequence.replaceSpanLast(
         }
     }
     return spanBuilder
+}
+
+/**
+ * 删除指定泛型Span
+ */
+inline fun <reified T : Any> CharSequence.clearSpans(
+    start: Int = 0,
+    end: Int = length
+): CharSequence {
+    if (this is Spannable) {
+        getSpans<T>(start, end).forEach {
+            removeSpan(it)
+        }
+    }
+    return this
 }
