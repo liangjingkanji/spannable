@@ -116,15 +116,7 @@ infix fun CharSequence.addSpan(text: CharSequence): CharSequence {
 fun CharSequence.addSpan(
     text: CharSequence, what: Any?, flags: Int = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
 ): CharSequence {
-    val spannable = when (what) {
-        is Array<*> -> what.fold(text) { s, span ->
-            s.setSpan(span, flags)
-        }
-        is List<*> -> what.fold(text) { s, span ->
-            s.setSpan(span, flags)
-        }
-        else -> text.setSpan(what, flags)
-    }
+    val spannable = text.setSpan(what, flags)
     return when (this) {
         is SpannableStringBuilder -> append(spannable)
         else -> SpannableStringBuilder(this).append(spannable)
@@ -164,6 +156,7 @@ fun CharSequence.addSpan(
  *
  * @param oldValue 被替换的字符串
  * @param ignoreCase 忽略大小写
+ * @param startIndex 从指定的索引开始
  * @param replacement 每次匹配到字符串都会调用此函数, 该函数返回值可以是[Spanned]或[Spanned]数组/集合或[CharSequence], 空字符则无效
  * 1. 如果返回null则表示不执行任何操作
  * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
@@ -179,14 +172,17 @@ fun CharSequence.addSpan(
  */
 @JvmOverloads
 fun CharSequence.replaceSpan(
-    oldValue: String, ignoreCase: Boolean = false, replacement: (MatchResult) -> Any?
+    oldValue: String,
+    ignoreCase: Boolean = false,
+    startIndex: Int = 0,
+    replacement: (MatchResult) -> Any?
 ): CharSequence {
     val regex = if (ignoreCase) {
         Regex.escape(oldValue).toRegex(RegexOption.IGNORE_CASE)
     } else {
         Regex.escape(oldValue).toRegex()
     }
-    return replaceSpan(regex, replacement = replacement)
+    return replaceSpan(regex, startIndex = startIndex, replacement = replacement)
 }
 
 /**
@@ -194,6 +190,7 @@ fun CharSequence.replaceSpan(
  *
  * @param regex 正则
  * @param quoteGroup 是否允许反向引用捕获组
+ * @param startIndex 从指定的索引开始
  * @param replacement 每次匹配到字符串都会调用此函数, 该函数返回值可以是[Spanned]或[Spanned]数组/集合或[CharSequence], 空字符则无效
  * 1. 如果返回null则表示不执行任何操作
  * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
@@ -209,9 +206,12 @@ fun CharSequence.replaceSpan(
  */
 @JvmOverloads
 fun CharSequence.replaceSpan(
-    regex: Regex, quoteGroup: Boolean = false, replacement: (MatchResult) -> Any?
+    regex: Regex,
+    quoteGroup: Boolean = false,
+    startIndex: Int = 0,
+    replacement: (MatchResult) -> Any?
 ): CharSequence {
-    val sequence = regex.findAll(this)
+    val sequence = regex.findAll(this, startIndex)
     val count = sequence.count()
     if (count == 0) return this
     var spanBuilder = if (this is Spannable) this else SpannableStringBuilder(this)
@@ -244,7 +244,9 @@ fun CharSequence.replaceSpan(
                                 if (adjustReplacement is Spannable) {
                                     adjustReplacement.setSpan(it)
                                 } else {
-                                    adjustReplacement = SpannableStringBuilder(adjustReplacement).apply { setSpan(it) }
+                                    adjustReplacement = SpannableStringBuilder(adjustReplacement).apply {
+                                        setSpan(it)
+                                    }
                                 }
                             }
                         }
@@ -268,6 +270,7 @@ fun CharSequence.replaceSpan(
  *
  * @param oldValue 被替换的字符串
  * @param ignoreCase 忽略大小写
+ * @param startIndex 从指定的索引开始
  * @param replacement 每次匹配到字符串都会调用此函数, 该函数返回值可以是[Spanned]或[Spanned]数组/集合或[CharSequence], 空字符则无效
  * 1. 如果返回null则表示不执行任何操作
  * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
@@ -283,14 +286,17 @@ fun CharSequence.replaceSpan(
  */
 @JvmOverloads
 fun CharSequence.replaceSpanFirst(
-    oldValue: String, ignoreCase: Boolean = false, replacement: (MatchResult) -> Any?
+    oldValue: String,
+    ignoreCase: Boolean = false,
+    startIndex: Int = 0,
+    replacement: (MatchResult) -> Any?
 ): CharSequence {
     val regex = if (ignoreCase) {
         Regex.escape(oldValue).toRegex(RegexOption.IGNORE_CASE)
     } else {
         Regex.escape(oldValue).toRegex()
     }
-    return replaceSpanFirst(regex, replacement = replacement)
+    return replaceSpanFirst(regex, startIndex = startIndex, replacement = replacement)
 }
 
 /**
@@ -298,6 +304,7 @@ fun CharSequence.replaceSpanFirst(
  *
  * @param regex 正则
  * @param quoteGroup 是否允许反向引用捕获组
+ * @param startIndex 从指定的索引开始
  * @param replacement 每次匹配到字符串都会调用此函数, 该函数返回值可以是[Spanned]或[Spanned]数组/集合或[CharSequence], 空字符则无效
  * 1. 如果返回null则表示不执行任何操作
  * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
@@ -313,9 +320,12 @@ fun CharSequence.replaceSpanFirst(
  */
 @JvmOverloads
 fun CharSequence.replaceSpanFirst(
-    regex: Regex, quoteGroup: Boolean = false, replacement: (MatchResult) -> Any?
+    regex: Regex,
+    quoteGroup: Boolean = false,
+    startIndex: Int = 0,
+    replacement: (MatchResult) -> Any?
 ): CharSequence {
-    val matchResult = regex.find(this) ?: return this
+    val matchResult = regex.find(this, startIndex) ?: return this
     var spanBuilder = if (this is Spannable) this else SpannableStringBuilder(this)
     val range = matchResult.range
     replacement(matchResult)?.let { spanned ->
@@ -344,7 +354,9 @@ fun CharSequence.replaceSpanFirst(
                             if (adjustReplacement is Spannable) {
                                 adjustReplacement.setSpan(it)
                             } else {
-                                adjustReplacement = SpannableStringBuilder(adjustReplacement).apply { setSpan(it) }
+                                adjustReplacement = SpannableStringBuilder(adjustReplacement).apply {
+                                    setSpan(it)
+                                }
                             }
                         }
                     }
@@ -366,6 +378,7 @@ fun CharSequence.replaceSpanFirst(
  *
  * @param oldValue 被替换的字符串
  * @param ignoreCase 忽略大小写
+ * @param startIndex 从指定的索引开始
  * @param replacement 每次匹配到字符串都会调用此函数, 该函数返回值可以是[Spanned]或[Spanned]数组/集合或[CharSequence], 空字符则无效
  * 1. 如果返回null则表示不执行任何操作
  * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
@@ -381,14 +394,17 @@ fun CharSequence.replaceSpanFirst(
  */
 @JvmOverloads
 fun CharSequence.replaceSpanLast(
-    oldValue: String, ignoreCase: Boolean = false, replacement: (MatchResult) -> Any?
+    oldValue: String,
+    ignoreCase: Boolean = false,
+    startIndex: Int = 0,
+    replacement: (MatchResult) -> Any?
 ): CharSequence {
     val regex = if (ignoreCase) {
         Regex.escape(oldValue).toRegex(RegexOption.IGNORE_CASE)
     } else {
         Regex.escape(oldValue).toRegex()
     }
-    return replaceSpanLast(regex, replacement = replacement)
+    return replaceSpanLast(regex, startIndex = startIndex, replacement = replacement)
 }
 
 /**
@@ -396,6 +412,7 @@ fun CharSequence.replaceSpanLast(
  *
  * @param regex 正则
  * @param quoteGroup 是否允许反向引用捕获组
+ * @param startIndex 从指定的索引开始
  * @param replacement 每次匹配到字符串都会调用此函数, 该函数返回值可以是[Spanned]或[Spanned]数组/集合或[CharSequence], 空字符则无效
  * 1. 如果返回null则表示不执行任何操作
  * 2. 返回单个Span则应用效果, 当然返回Span集合或数组就会应用多个效果,
@@ -411,9 +428,12 @@ fun CharSequence.replaceSpanLast(
  */
 @JvmOverloads
 fun CharSequence.replaceSpanLast(
-    regex: Regex, quoteGroup: Boolean = false, replacement: (MatchResult) -> Any?
+    regex: Regex,
+    quoteGroup: Boolean = false,
+    startIndex: Int = 0,
+    replacement: (MatchResult) -> Any?
 ): CharSequence {
-    val matchResult = regex.findAll(this).lastOrNull() ?: return this
+    val matchResult = regex.findAll(this, startIndex).lastOrNull() ?: return this
     var spanBuilder = if (this is Spannable) this else SpannableStringBuilder(this)
     val range = matchResult.range
     replacement(matchResult)?.let { spanned ->
@@ -442,7 +462,9 @@ fun CharSequence.replaceSpanLast(
                             if (adjustReplacement is Spannable) {
                                 adjustReplacement.setSpan(it)
                             } else {
-                                adjustReplacement = SpannableStringBuilder(adjustReplacement).apply { setSpan(it) }
+                                adjustReplacement = SpannableStringBuilder(adjustReplacement).apply {
+                                    setSpan(it)
+                                }
                             }
                         }
                     }
