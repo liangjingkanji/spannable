@@ -20,17 +20,19 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.text.TextPaint
+import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.View
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
+import com.drake.spannable.movement.ClickableMovementMethod
 
 /**
  * 创建字体颜色/字体样式/可点击效果
  * @param color 字体颜色
  * @param typeface 字体样式
- * @param onClick 点击事件
+ * @param onClick 点击事件 要求设置[ClickableMovementMethod]或者[LinkMovementMethod], 否则点击事件是无效的, 此为Android官方限制
  */
 class HighlightSpan @JvmOverloads constructor(
     @ColorInt val color: Int? = null,
@@ -42,7 +44,7 @@ class HighlightSpan @JvmOverloads constructor(
      * 创建字体颜色/字体样式/可点击效果
      * @param color 字体颜色
      * @param typeface 字体样式
-     * @param onClick 点击事件
+     * @param onClick 点击事件 要求设置[ClickableMovementMethod]或者[LinkMovementMethod], 否则点击事件是无效的, 此为Android官方限制
      */
     @JvmOverloads
     constructor(
@@ -55,7 +57,7 @@ class HighlightSpan @JvmOverloads constructor(
      * 创建字体颜色/字体样式/可点击效果
      * @param colorRes 字体颜色
      * @param typeface 字体样式
-     * @param onClick 点击事件
+     * @param onClick 点击事件 要求设置[ClickableMovementMethod]或者[LinkMovementMethod], 否则点击事件是无效的, 此为Android官方限制
      */
     @JvmOverloads
     constructor(
