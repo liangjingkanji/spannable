@@ -39,8 +39,5 @@ android {
 
 
 dependencies {
-    implementation fileTree(include: ["*.jar"], dir: "libs")
-    implementation "androidx.core:core-ktx:1.6.0"
-
     compileOnly "com.github.bumptech.glide:glide:4.11.0"
 }

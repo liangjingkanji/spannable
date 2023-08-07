@@ -38,7 +38,6 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
 import android.view.Gravity
 import android.widget.TextView
-import androidx.core.text.getSpans
 import java.lang.ref.WeakReference
 import kotlin.math.max
 
@@ -201,7 +200,7 @@ class CenterImageSpan : ImageSpan {
             )
             if (text is Spanned) {
                 // draw text color
-                text.getSpans<ForegroundColorSpan>(start, end).lastOrNull()?.let {
+                text.getSpans(start, end, ForegroundColorSpan::class.java).lastOrNull()?.let {
                     paint.color = it.foregroundColor
                 }
             }

@@ -35,7 +35,6 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.ReplacementSpan
 import android.view.Gravity
 import android.widget.TextView
-import androidx.core.text.getSpans
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.Request
@@ -200,10 +199,12 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
                     fm.ascent = fontMetrics.ascent - (imageHeight - fontHeight) / 2 - drawableMargin.top
                     fm.descent = fm.ascent + imageHeight + drawableMargin.bottom
                 }
+
                 Align.BASELINE -> {
                     fm.ascent = fontMetrics.bottom - imageHeight - fontMetrics.descent - drawableMargin.top - drawableMargin.bottom
                     fm.descent = 0
                 }
+
                 Align.BOTTOM -> {
                     fm.ascent = fontMetrics.descent - imageHeight - drawableMargin.top - drawableMargin.bottom
                     fm.descent = 0
@@ -232,7 +233,7 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
         canvas.save()
         val bounds = drawable?.bounds ?: getDrawableSize()
         val transY = when (align) {
-            Align.CENTER ->  (2 * y + paint.fontMetricsInt.ascent + paint.fontMetricsInt.descent) / 2 - bounds.bottom / 2 - drawableMargin.height() / 2
+            Align.CENTER -> (2 * y + paint.fontMetricsInt.ascent + paint.fontMetricsInt.descent) / 2 - bounds.bottom / 2 - drawableMargin.height() / 2
             Align.BASELINE -> bottom - bounds.bottom - paint.fontMetricsInt.descent - drawableMargin.bottom
             Align.BOTTOM -> bottom - bounds.bottom - drawableMargin.bottom
         }
@@ -254,7 +255,7 @@ class GlideImageSpan(val view: TextView, val url: Any) : ReplacementSpan() {
             )
             if (text is Spanned) {
                 // draw text color
-                text.getSpans<ForegroundColorSpan>(start, end).lastOrNull()?.let {
+                text.getSpans(start, end, ForegroundColorSpan::class.java).lastOrNull()?.let {
                     paint.color = it.foregroundColor
                 }
             }

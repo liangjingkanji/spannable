@@ -27,7 +27,6 @@ package com.drake.spannable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
-import androidx.core.text.getSpans
 
 /**
  * 设置Span文字效果
@@ -497,7 +496,7 @@ inline fun <reified T : Any> CharSequence.clearSpans(
     end: Int = length
 ): CharSequence {
     if (this is Spannable) {
-        getSpans<T>(start, end).forEach {
+        getSpans(start, end, T::class.java).forEach {
             removeSpan(it)
         }
     }
