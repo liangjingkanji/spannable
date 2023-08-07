@@ -9,12 +9,12 @@
 <p align="center">
 <a href="https://jitpack.io/#liangjingkanji/spannable"><img src="https://jitpack.io/v/liangjingkanji/spannable.svg"/></a>
 <img src="https://img.shields.io/badge/language-kotlin-orange.svg"/>
-<img src="https://img.shields.io/badge/license-Apache-blue"/>
+<img src="https://img.shields.io/badge/license-MIT-blue"/>
 <img src="https://raw.githubusercontent.com/liangjingkanji/liangjingkanji/master/img/group.svg"/>
 </p>
 
 <p align="center">
-<a href="https://github.com/liangjingkanji/spannable/releases/download/1.2.6/spannale-sample.apk">下载体验</a>
+<a href="https://github.com/liangjingkanji/spannable/releases/latest/download/spannale-sample.apk">下载体验</a>
 </p>
 
 <br>
@@ -63,20 +63,7 @@
 
 ## 安装
 
-添加远程仓库根据创建项目的 Android Studio 版本有所不同
-
-Android Studio Arctic Fox以下创建的项目 在项目根目录的 build.gradle 添加仓库
-
-```groovy
-allprojects {
-    repositories {
-        // ...
-        maven { url 'https://jitpack.io' }
-    }
-}
-```
-
-Android Studio Arctic Fox以上创建的项目 在项目根目录的 settings.gradle 添加仓库
+在项目根目录的 settings.gradle 添加仓库
 
 ```kotlin
 dependencyResolutionManagement {
@@ -90,7 +77,7 @@ dependencyResolutionManagement {
 然后在 module 的 build.gradle 添加依赖框架
 
 ```groovy
-implementation 'com.github.liangjingkanji:spannable:1.2.6'
+implementation 'com.github.liangjingkanji:spannable:1.2.7'
 ```
 
 
